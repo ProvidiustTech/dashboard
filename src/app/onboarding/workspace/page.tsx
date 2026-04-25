@@ -31,7 +31,7 @@ export default function WorkspacePage() {
   return (
     <div className="min-h-screen p-10 bg-[#F1F5F9] dark:bg-gray-950 flex items-center justify-center xl:pt-16 pb-16 px-4 transition-colors duration-200">
       <form action="/onboarding/channels">
-        <div className=" xl:w-[100%] w-[95%] ml-3 xl:ml-8 xl:max-w-[750px] bg-[#F1F5F9] dark:bg-gray-950 rounded-2xl  mt-4 xl:mr-28 border-gray-100 dark:border-gray-800 xl:px-12 py-12 transition-colors duration-200">
+        <div className=" xl:w-[100%] w-[108%] ml-[-10px] xl:ml-8 xl:max-w-[750px] bg-[#F1F5F9] dark:bg-gray-950 rounded-2xl  mt-4 xl:mr-28 border-gray-100 dark:border-gray-800 xl:px-12 py-12 transition-colors duration-200">
           <div className="xl:block hidden">
             <Stepper current={2} />
           </div>

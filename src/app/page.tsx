@@ -74,7 +74,7 @@ export default function SignInPage() {
 
             {/* Placeholder image area with teal overlay feel */}
             <div className="absolute inset-0 bg-gradient-to-b from-[#0D9488]/30 to-[#0D9488]-dark/60" />
-            <img className="xl:w-[92%] h-[43%] xl:mt-0 object-cover rounded-xl xl:h-[80%]" src="/dashboard/lady.png" alt="Customer Support Demo" />
+            <img className="xl:w-[92%] mt-8 h-[43%] xl:mt-0 object-cover rounded-xl xl:h-[80%]" src="/dashboard/lady.png" alt="Customer Support Demo" />
             
             {/* Navigation dots - Mobile and Tablet only */}
             <div className="xl:hidden absolute top-[65%] right-16 flex gap-2 z-10">

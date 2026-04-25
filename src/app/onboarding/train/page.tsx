@@ -46,7 +46,7 @@ export default function TrainAIPage() {
           <MobileStepper current={4} onBack={() => router.back()} />
 
         </div>
-        <form action="/dashboard">
+        <form action="/onboarding/success">
           <div className="w-full pl-10 xl:max-w-[620px] xl:ml-10">
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Build Your Knowledge Base</h2>
