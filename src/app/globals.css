@@ -1,17 +1,63 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* Degular Font - Web-safe formats */
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/degulardemo-regular-webfont.woff2') format('woff2'),
+       url('/fonts/degulardemo-regular-webfont.woff') format('woff');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/degulardemo-medium-webfont.woff2') format('woff2'),
+       url('/fonts/degulardemo-medium-webfont.woff') format('woff');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/degulardemo-bold-webfont.woff2') format('woff2'),
+       url('/fonts/degulardemo-bold-webfont.woff') format('woff');
+  font-weight: 700;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- */
-
-
-/* @import "tailwindcss"; */
 
 
 
+@layer base {
+  @font-face {
+    font-family: 'Degular';
+    src: url('/fonts/degular-regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+  }
+}
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@layer base {
+  html {
+    overflow-x: hidden;
+  }
 
-/* @import "tailwindcss"; */
+  * {
+    font-family: 'Degular', 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply font-degular overflow-x-hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-degular font-bold;
+  }
+  
+  button {
+    @apply font-degular;
+  }
+}

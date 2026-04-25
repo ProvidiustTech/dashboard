@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors font-degular duration-200">
         <ThemeProvider>
           {children}
         </ThemeProvider>

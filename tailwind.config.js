@@ -6,7 +6,11 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        degular: ["var(--font-degular)", "sans-serif"],
+      },
+    },
   },
   plugins: [],
 }

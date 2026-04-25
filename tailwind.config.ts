@@ -13,7 +13,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        degular: ["var(--font-degular)", "sans-serif"],
       },
     },
   },
