@@ -157,7 +157,7 @@ export default function RuleDetailPage() {
           {/* When (Trigger) */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 transition-colors duration-200">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center text-base">⚡</div>
+              <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center text-base"></div>
               <h2 className="text-base font-semibold text-gray-900 dark:text-white transition-colors duration-200">When (Trigger)</h2>
             </div>
             <div className="grid grid-cols-2 gap-5">

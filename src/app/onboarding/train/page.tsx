@@ -37,9 +37,9 @@ export default function TrainAIPage() {
 
   return (
     <div className="xl:min-h-screen bg-[#F1F5F9] dark:bg-gray-950 flex transition-colors duration-200 flex-col items-center px-4 pt-20 pb-16">
-      <div className="xl:h-screen  mt-2 xl:mr-24 mr-12">
-        <div className="xl:block hidden">
-          <Stepper current={2} />
+      <div className="xl:h-screen  ml-20 mt-2 xl:mr-24 mr-12">
+        <div className="xl:block mt-10 hidden">
+          <Stepper current={4} />
         </div>
 
         <div className="xl:hidden block relative w-[89%] ml-10 top-[-30px]">
@@ -47,7 +47,7 @@ export default function TrainAIPage() {
 
         </div>
         <form action="/onboarding/success">
-          <div className="w-full pl-10 xl:max-w-[620px] xl:ml-10">
+          <div className="w-full pl-10 xl:max-w-[620px] xl:ml-1">
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Build Your Knowledge Base</h2>
             <p className="text-gray-500 dark:text-gray-500 text-sm mb-8 transition-colors duration-200">
@@ -153,7 +153,7 @@ export default function TrainAIPage() {
                 <button type="button" className="text-[#F7FAFC]0 xl:block hidden hover:text-gray-700 font-medium text-sm transition-colors cursor-pointer">Back</button>
               </Link>
               <div className="flex items-center gap-3">
-                <Link href="/dashboard">
+                <Link href="/onboarding/success">
                   <button type="submit" className="border xl:block hidden border-gray-200 dark:text-black hover:border-gray-300 text-[#F7FAFC]0 hover:text-gray-700 font-medium rounded-xl px-6 py-3 text-sm transition-colors cursor-pointer bg-white">Skip</button>
                 </Link>
                 <button type="submit" className="bg-[#0D9488] hover:bg-[#0D9488]-dark text-white font-semibold top-8 xl:top-0 xl:ml-2 relative rounded-xl xl:px-8 xl:py-3 px-[153px] ml-[-10px] py-4 text-sm transition-colors cursor-pointer">Continue</button>

@@ -26,20 +26,22 @@ export default function ConfigurePage() {
 
 
   return (
-    <div className="flex flex-col xl:flex-row h-screen bg-white dark:bg-gray-950 transition-colors duration-200 overflow-hidden">
+    <div className="flex flex-col xl:flex-row h-screen bg-[#F7FAFC] dark:bg-gray-950 transition-colors duration-200 overflow-hidden">
       <div className="hidden xl:block">
         <Sidebar />
       </div>
-
       <MobileNav/>
+{/* <div className="sticky">
 
-      <main className="flex-1 mt-16 xl:mt-9 overflow-y-auto px-7 xl:px-6 xl:px-10 py-4 xl:py-6 xl:py-8">
-        <h1 className="text-xl xl:text-3xl mb-5 xl:mb-2 font-semibold mb-5 text-gray-900 dark:text-white mb-10 transition-colors duration-200">Add a New Channel</h1>
+</div> */}
+
+      <main className="flex-1 mt-40  ml-1 xl:ml-5  xl:mt-9 overflow-y-auto px-7 py-4 xl:py-8">
+        <h1 className="text-xl xl:text-3xl xl:mb-2 font-semibold text-gray-900 dark:text-white mb-10 transition-colors duration-200">Add a New Channel</h1>
         <p className="text-xs xl:text-sm hidden xl:block  text-gray-400 dark:text-gray-100 mb-6 transition-colors duration-200">
           Connect a communication channel to start handling customer conversations with AI.
         </p>
 
-        <div className="block xl:hidden mb-6 xl:mb-8">
+        <div className="block fixed backdrop-blur-sm xl:hidden mt-[-147px] w-[90%] pt-4 h-20 mb-6 xl:mb-8">
                  <StepperIn current={3} />
                </div>
         <div className="hidden xl:block mb-6 xl:mb-8">
@@ -105,14 +107,14 @@ export default function ConfigurePage() {
           </section>
 
           {/* AI Confidence Level */}
-          <section className="mb-6 xl:mb-8 leading-[90px]">
+          <section className="mb-6 xl:mb-8">
             <h3 className="text-sm xl:text-base font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">AI Confidence Level</h3>
             <p className="text-xs xl:text-sm text-gray-400 dark:text-gray-500 mb-4 xl:mb-5 transition-colors duration-200">
               Adjust how much your AI should escalate to human agents versus automating responses.
             </p>
 
             {/* Slider with tooltip */}
-            <div className="relative mb-2">
+            <div className="relative mb-2 mt-10">
               {/* Tooltip */}
               <div
                 className="absolute -top-8 flex flex-col items-center transition-all"
@@ -132,7 +134,7 @@ export default function ConfigurePage() {
                 max={100}
                 value={confidence}
                 onChange={(e) => setConf(Number(e.target.value))}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                className="w-full h-2 mt-5 rounded-full appearance-none cursor-pointer"
                 style={{
                   background: `linear-gradient(to right, #14A085 ${confidence}%, #e2e8f0 ${confidence}%)`,
                 }}

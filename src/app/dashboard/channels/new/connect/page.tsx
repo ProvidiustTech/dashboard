@@ -27,23 +27,23 @@ export default function ConnectAccountPage() {
 
       <MobileNav/>
 
-      <main className="flex-1 overflow-y-auto mt-16 xl:mt-9  px-7 xl:px-6 xl:px-10 py-4 xl:py-6 xl:py-8">
-        <h1 className="text-xl xl:text-3xl mb-5 xl:mb-2 font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Add a New Channel</h1>
+      <main className="flex-1 overflow-y-auto mt-16 xl:mt-9 ml-1 xl:ml-5  px-7 py-4 xl:py-8">
+        <h1 className="text-xl xl:text-3xl xl:mb-2 font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Add a New Channel</h1>
         <p className="text-xs xl:text-sm hidden xl:block text-gray-400 dark:text-gray-100 mb-6 transition-colors duration-200">
           Connect a communication channel to start handling customer conversations with AI.
         </p>
 
         <div className="block xl:hidden mb-6 xl:mb-8">
-                 <StepperIn current={3} />
+                 <StepperIn current={2} />
                </div>
         <div className="hidden xl:block mb-6 xl:mb-8">
-                 <StepperDe current={3} />
+                 <StepperDe current={2} />
                </div>
 
 
 
         {/* Form card */}
-        <div className="max-w-2xl justify-center border border-gray-200 dark:border-gray-800 rounded-lg xl:rounded-xl p-6 xl:p-10 mx-auto transition-colors duration-200">
+        <div className="max-w-2xl justify-center xl:mx-0 border border-gray-200 dark:border-gray-800 rounded-lg xl:rounded-xl p-6 xl:p-10 mx-auto transition-colors duration-200">
           <h2 className="text-base xl:text-lg text-gray-900 dark:text-white mb-6 transition-colors duration-200">
             Connect Your WhatsApp business account to Providus
           </h2>

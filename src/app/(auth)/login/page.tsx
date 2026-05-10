@@ -126,8 +126,8 @@ export default function SignInPage() {
 
         {/* ── Right sign-in panel ── */}
         <div className="flex-1  overflow-y-auto xl:h-screen flex h-[50%] xl:pt-0 pt-40 text-md xl:text-xl flex-col bottom-2 top-[-20px] relative justify-center px-8 sm:px-12 py-14 bg-[#F1F5F9] dark:bg-gray-900 transition-colors duration-200">
-          <h2 className="text-[23px] xl:text-[39px]  mt-10  font-bold  text-gray-900 dark:text-white mb-2 text-center transition-colors">Welcome back</h2>
-          <p className="text-gray-400 dark:text-gray-500 text-sm xl:text-lg xl:top-10 relative mb-9 text-center transition-colors">Sign in to your workspace</p>
+          <h1 className="xl:text-5xl text-3xl font-medium dark:text-white xl:relative xl:top-12 text-gray-900 text-center mb-2 tracking-tight">Welcome back!</h1>
+          <p className="text-gray-400 dark:text-gray-500 text-sm xl:text-lg xl:top-14 relative mb-9 text-center transition-colors">Sign in to your workspace</p>
 
           <form action="/onboarding/success" className="w-full">
             <div className="space-y-5 max-w-sm w-full mt-0 xl:mt-16 mx-auto">
@@ -185,7 +185,7 @@ export default function SignInPage() {
                 />
                 <span className="text-sm xl:text-lg text-gray-600 dark:text-gray-400 transition-colors">Remember me</span>
               </label>
-              <a href="#" className="text-sm xl:text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+              <a href="/login/forgotpassword" className="text-sm xl:text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:underline hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
                 Forgot password?
               </a>
             </div>

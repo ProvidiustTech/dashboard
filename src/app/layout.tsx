@@ -27,19 +27,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `
               (function() {
                 try {
-                  var t = localStorage.getItem('providius-theme');
-                  var isDark =
-                    t === 'Dark' ||
-                    (t === 'System' && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
-                    (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (isDark) document.documentElement.classList.add('dark');
-                } catch(e) {}
+                  var c = document.cookie.split('; ').find(function(r) { return r.indexOf('providius-theme=') === 0; });
+                  var t = c ? c.split('=')[1] : localStorage.getItem('providius-theme');
+                  
+                  var isDark = t === 'Dark' || ((t === 'System' || !t) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch(e) { console.error('Theme script error:', e); }
               })();
             `,
           }}
         />
       </head>
-      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors font-degular duration-200">
+      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors font-degular duration-200" suppressHydrationWarning>
         <ThemeProvider>
           {children}
         </ThemeProvider>

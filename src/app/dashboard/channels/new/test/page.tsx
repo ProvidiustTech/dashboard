@@ -25,24 +25,24 @@ export default function TestActivatePage() {
   };
 
   return (
-    <div className="flex flex-col xl:flex-row h-screen bg-white dark:bg-gray-950 transition-colors duration-200 overflow-hidden">
+    <div className="flex flex-col xl:flex-row h-screen bg-[#F7FAFC] dark:bg-gray-950 transition-colors duration-200 overflow-hidden">
       <div className="hidden xl:block">
         <Sidebar />
       </div>
 
       <MobileNav/>
 
-      <main className="flex-1 mt-16 xl:mt-9  overflow-y-auto px-7 xl:px-6 xl:px-10 py-4 xl:py-6 xl:py-8">
-        <h1 className="text-xl xl:text-3xl mb-5 xl:mb-2 font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Add a New Channel</h1>
+      <main className="flex-1 mt-16 xl:mt-9  ml-1 xl:ml-5  overflow-y-auto px-7 py-4 xl:py-8">
+        <h1 className="text-xl xl:text-3xl xl:mb-2 font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Add a New Channel</h1>
         <p className="text-xs xl:text-sm hidden xl:block text-gray-400 dark:text-gray-100 mb-6 transition-colors duration-200">
           Connect a communication channel to start handling customer conversations with AI.
         </p>
 
         <div className="block xl:hidden mb-6 xl:mb-8">
-                 <StepperIn current={3} />
+                 <StepperIn current={4} />
                </div>
         <div className="hidden xl:block mb-6 xl:mb-8">
-                 <StepperDe current={3} />
+                 <StepperDe current={4} />
                </div>
 
 
@@ -63,9 +63,9 @@ export default function TestActivatePage() {
             </div>
             {/* Expand icon */}
             <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0">
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+              {/* <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                 <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              </svg> */}
             </button>
           </div>
 

@@ -19,7 +19,7 @@ export default function MobileStepper({ current, onBack }: MobileStepperProps) {
   const pct   = (current / total) * 100
 
   return (
-    <div className="w-full dark:bg-gray-950 mt-[-10%] bg-[#F1F5F9]]">
+    <div className="w-[149%] pr-10 ml-[-10px] backdrop-blur-sm dark:bg-gray-950 mt-[-10%] bg-[#F1F5F9]] ">
       {/* ── Row: back arrow · step badge · step label ── */}
       <div className="flex items-center gap-3 px-5 pt-5 pb-4">
         {/* Back arrow */}

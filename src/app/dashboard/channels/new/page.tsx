@@ -29,24 +29,24 @@ export default function AddChannelPage() {
 
       <MobileNav/>
 
-      <main className="flex-1 overflow-y-auto mt-16 xl:mt-9 xl:ml-5 ml-3 px-4 xl:px-6 xl:px-10 py-4 xl:py-6 xl:py-8 pb-8">
+      <main className="flex-1 overflow-y-auto mt-40 xl:mt-9 xl:ml-5 ml-3 px-4 py-4  xl:py-8 pb-8">
         {/* Page header */}
-        <h1 className="text-xl xl:text-3xl mb-5 xl:mb-2 font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Add a New Channel</h1>
-        <p className="text-xs xl:text-sm hidden xl:block text-gray-400 hidden xl:block dark:text-gray-100 mb-6 xl:mb-8 transition-colors duration-200">
+        <h1 className="text-xl xl:text-3xl xl:mb-2 font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Add a New Channel</h1>
+        <p className="text-xs xl:text-sm hidden xl:block text-gray-400 dark:text-gray-100 mb-6 xl:mb-8 transition-colors duration-200">
           Connect a communication channel to start handling customer conversations with AI.
         </p>
 
         {/* Sub-stepper */}
         
-        <div className="block xl:hidden mb-6 xl:mb-8">
-                 <StepperIn current={3} />
-               </div>
+        <div className="block fixed backdrop-blur-sm xl:hidden mt-[-147px] w-[90%] pt-4 h-20 mb-6 xl:mb-8">
+                         <StepperIn current={1} />
+                       </div>
         <div className="hidden xl:block mb-6 xl:mb-8">
-                 <StepperDe current={3} />
+                 <StepperDe current={1} />
                </div>
 
         {/* Channel grid */}
-        <div className="grid grid-cols-2 xl:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-9 xl:max-w-[95%] max-w-6xl mb-6 xl:mb-8">
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-9 xl:max-w-[95%] max-w-6xl mb-6 xl:mb-8">
           {CHANNELS.map(({ id, Icon, name, desc, popular }) => {
             const on = selected === id;
             return (

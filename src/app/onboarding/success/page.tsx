@@ -84,7 +84,7 @@ export default function SuccessPage() {
                 >
                     You can always revisit setup from{" "}
                     <Link
-                        href="/settings"
+                        href="/dashboard/settings"
                         className="underline underline-offset-2 hover:text-[#1BAA87] transition-colors"
                     >
                         Settings

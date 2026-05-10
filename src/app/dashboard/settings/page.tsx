@@ -611,7 +611,11 @@ function AppearanceTab() {
             return (
               <button
                 key={t}
-                onClick={() => setTheme(t)}
+                onClick={() => {
+                  setTheme(t);
+                  setSaved(true); // Immediate visual feedback
+                  setTimeout(() => setSaved(false), 1500);
+                }}
                 className={`flex flex-col items-center gap-2 p-3 xl:p-4 rounded-2xl border-2 w-24 xl:w-28 flex-shrink-0 transition-all ${
                   active ? "border-[#14A085]  dark:bg-black  bg-white" : "border-gray-100  dark:bg-black dark:border-gray-800 bg-gray-50 hover:border-gray-200"
                 }`}

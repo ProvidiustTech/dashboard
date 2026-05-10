@@ -20,10 +20,12 @@ const BENEFITS = [
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [form, setForm]       = useState({ company: '', email: '', password: '' })
+  const [form, setForm]       = useState({ company: '', email: '', password: '', confirmPassword: '' })
   const [errors, setErrors]   = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [focused, setFocused] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
@@ -33,6 +35,7 @@ export default function RegisterPage() {
     if (!form.company.trim())         e.company  = 'Company name is required'
     if (!form.email.includes('@'))    e.email    = 'Enter a valid email'
     if (form.password.length < 8)     e.password = 'Minimum 8 characters'
+    if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match'
     setErrors(e)
     return !Object.keys(e).length
   }
@@ -41,20 +44,48 @@ export default function RegisterPage() {
     ev.preventDefault()
     if (!validate()) return
     setLoading(true)
-    // TODO: call auth.register(form) here
-    await new Promise(r => setTimeout(r, 900))   // simulated delay
-    router.push('/onboarding/workspace')
+    setErrors({})
+
+    // Sanitize the base URL by removing any trailing slashes
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+    const registrationUrl = `${baseUrl}/api/v1/auth/register`;
+
+    try {
+      const { confirmPassword, ...dataToSubmit } = form;
+      const response = await fetch(registrationUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSubmit),
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Registration failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          errorMessage = `Server Error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+      
+      router.push('/onboarding/workspace');
+    } catch (err) {
+      setErrors({ submit: err instanceof Error ? err.message : 'Could not connect to the server. Please check if the backend is running.' });
+    } finally {
+      setLoading(false);
+    }
   }
 
   const inputCls = (k: string) =>
-    `w-full px-4 py-3.5 rounded-xl dark:bg-gray-800 border-gray-500 dark:placeholder-gray-500 xl:text-base text-sm outline-none border-1 transition-all duration-150 bg-white
+    `w-full px-4 py-3.5 rounded-xl dark:bg-gray-800 border-gray-500 dark:placeholder-gray-500 xl:text-base text-sm outline-none border transition-all duration-150 bg-white
      ${focused === k   ? 'border-teal-500 ring-4 ring-teal-500/10'
      : errors[k]       ? 'border-red-400'
      :                   'border-gray-200 hover:border-gray-300'}`
 
   return (
     <div className="min-h-screen dark:bg-gray-900 bg-[#F0F2F5] flex items-center justify-center p-4 sm:p-8">
-      <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6 lg:gap-10 items-center lg:items-stretch">
+      <div className="w-[90%] max-w-7xl flex flex-col lg:flex-row gap-6 lg:gap-16 items-center lg:items-stretch">
 
         {/* ── LEFT — benefits ─────────────────────────────────────── */}
         <div className="w-full lg:w-[60%] flex flex-col justify-between py-4 lg:py-10 px-2">
@@ -149,15 +180,35 @@ export default function RegisterPage() {
               <label className="block xl:text-lg dark:text-white text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={set('password')}
-                onFocus={() => setFocused('password')}
-                onBlur={() => setFocused('')}
-                className={inputCls('password')}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={set('password')}
+                  onFocus={() => setFocused('password')}
+                  onBlur={() => setFocused('')}
+                  className={`${inputCls('password')} pr-12`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 1.657-.672 3.157-1.757 4.243A6 6 0 0121 12a6 6 0 00-6-6" />
+                      <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" strokeWidth={2} />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-xs text-red-500 mt-1">{errors.password}</p>
               )}
@@ -178,6 +229,50 @@ export default function RegisterPage() {
                 </div>
               )}
             </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block xl:text-lg dark:text-white text-sm font-medium text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={form.confirmPassword}
+                  onChange={set('confirmPassword')}
+                  onFocus={() => setFocused('confirmPassword')}
+                  onBlur={() => setFocused('')}
+                  className={`${inputCls('confirmPassword')} pr-12`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 1.657-.672 3.157-1.757 4.243A6 6 0 0121 12a6 6 0 00-6-6" />
+                      <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" strokeWidth={2} />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>
+              )}
+            </div>
+
+            {/* Global Submit Error */}
+            {errors.submit && (
+              <p className="text-sm text-red-500 text-center font-medium bg-red-50 dark:bg-red-900/20 py-2 rounded-lg">{errors.submit}</p>
+            )}
 
             {/* Submit */}
             <button

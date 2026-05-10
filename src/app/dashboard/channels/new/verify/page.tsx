@@ -39,15 +39,15 @@ export default function VerifyOTPPage() {
   const filled = otp.every((d) => d !== "");
 
   return (
-    <div className="flex flex-col xl:flex-row h-screen bg-white dark:bg-gray-950 transition-colors duration-200 overflow-hidden">
+    <div className="flex flex-col xl:flex-row h-screen bg-[#F7FAFC] dark:bg-gray-950 transition-colors duration-200 overflow-hidden">
       <div className="hidden xl:block">
         <Sidebar />
       </div>
 
       <MobileNav/>
 
-      <main className="flex-1 mt-16 xl:mt-9  overflow-y-auto px-7 xl:px-6 xl:px-10 py-4 xl:py-6 xl:py-8">
-        <h1 className="text-xl xl:text-3xl mb-5 xl:mb-2 font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Add a New Channel</h1>
+      <main className="flex-1 mt-16 xl:mt-9  overflow-y-auto px-7  ml-1 xl:ml-5 py-4 xl:py-8">
+        <h1 className="text-xl xl:text-3xl xl:mb-2 font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Add a New Channel</h1>
         <p className="text-xs xl:text-sm hidden xl:block text-gray-400 dark:text-gray-100 mb-6 transition-colors duration-200">
           Connect a communication channel to start handling customer conversations with AI.
         </p>
@@ -61,7 +61,7 @@ export default function VerifyOTPPage() {
 
 
         {/* OTP card */}
-        <div className="max-w-xl w-full border border-gray-200 dark:border-gray-800 rounded-lg xl:rounded-xl p-6 xl:p-10 mx-auto transition-colors duration-200">
+        <div className="max-w-xl w-full border border-gray-200 dark:border-gray-800 rounded-lg xl:rounded-xl p-6 xl:p-10 xl:mx-0 mx-auto transition-colors duration-200">
           <h2 className="text-lg xl:text-xl font-semibold text-gray-900 dark:text-white mb-2 transition-colors duration-200">Verify Email OTP</h2>
           <p className="text-xs xl:text-sm text-gray-500 dark:text-gray-400 mb-6 xl:mb-8 transition-colors duration-200">
             Enter the OTP sent to{" "}

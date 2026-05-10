@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import Link from "next/dist/client/link";
 import MobileNav from "@/components/MobileNav";
@@ -71,7 +71,7 @@ function NewRuleModal({ onClose, onSave }: { onClose: () => void; onSave: (r: Ru
     onSave({
       id: String(Date.now()), name, desc, status: "Draft",
       when: when || "Intent: new_intent", then: then || "Take action",
-      icon: "⚡", iconBg: "bg-purple-100 dark:bg-purple-900",
+      icon: "", iconBg: "bg-purple-100 dark:bg-purple-900",
     });
     onClose();
   };
@@ -129,9 +129,25 @@ function NewRuleModal({ onClose, onSave }: { onClose: () => void; onSave: (r: Ru
 }
 
 export default function AutomationPage() {
-  const [rules, setRules] = useState<Rule[]>(INIT_RULES);
+  const [rules, setRules] = useState<Rule[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRules = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/rules`);
+        const data = await res.json();
+        setRules(data);
+      } catch (error) {
+        console.error("Failed to fetch rules:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRules();
+  }, []);
 
   const toggleStatus = (id: string) =>
     setRules((p) => p.map((r) =>
@@ -148,7 +164,7 @@ export default function AutomationPage() {
 
       {showModal && <NewRuleModal onClose={() => setModal(false)} onSave={(r) => setRules((p) => [...p, r])} />}
 
-      <div className="xl:mt-10 mt-16 overflow-scroll xl:overflow-x-hidden mb-10 xl:w-[78%]">
+      <div className="xl:mt-10 mt-16 overflow-auto w-[100%] min-h-screen xl:overflow-x-hidden mb-10 xl:w-[78%]">
         <main className="flex-1 overflow-y-auto px-6 xl:px-10 py-8" onClick={() => setMenuOpen(null)}>
           {/* Header */}
           <div className="flex items-start justify-between mb-8 flex-wrap gap-3">
@@ -262,7 +278,7 @@ export default function AutomationPage() {
             {/* Empty state */}
             {rules.length === 0 && (
               <div className="text-center py-16 border-2 border-dashed rounded-2xl border-gray-200 dark:border-gray-700">
-                <div className="text-4xl mb-3">⚡</div>
+                <div className="text-4xl mb-3"></div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">No automation rules yet</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-5">Create your first rule to automate customer responses</p>
                 <button onClick={() => setModal(true)} className="bg-emerald-600 dark:bg-emerald-600 hover:bg-emerald-700 dark:hover:bg-emerald-700 text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-colors">

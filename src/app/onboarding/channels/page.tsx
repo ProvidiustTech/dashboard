@@ -29,17 +29,16 @@ export default function ChannelsPage() {
 
   return (
         <div className="min-h-screen p-10 bg-[#F1F5F9] dark:bg-gray-950 flex items-center justify-center xl:pt-16 pb-16 px-4 transition-colors duration-200">
-      <div className="h-screen  mt-12 ">
-        <div className="xl:block hidden">
-          <Stepper current={2} />
+      <div className="h-screen  mt-[48px] ">
+        <div className="xl:block hidden ml-[-18px] mt-5">
+          <Stepper current={3} />
         </div>
 
-        <div className="xl:hidden block relative top-[-30px]">
-          <MobileStepper current={3} onBack={() => router.back()} />
-
+        <div className="xl:hidden z-[9999] block fixed top-[29px]">
+                    <MobileStepper current={3} onBack={() => router.back()} />
         </div>
         <form action="/onboarding/train">
-          <div className="w-full">
+          <div className="w-full mt-16 ">
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 xl:text-center transition-colors duration-200">Connect your support channels</h2>
             <p className="text-gray-400 dark:text-gray-500 text-sm mb-8 dark:text-white xl:text-center transition-colors duration-200">Add a channel for your&nbsp;business support</p>

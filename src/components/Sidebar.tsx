@@ -47,7 +47,7 @@ export default function Sidebar() {
   return (
     <aside className="w-64 xl:flex hidden rounded-3xl ml-6 mt-10 pl-2 flex-shrink-0 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex-col h-[92%] sticky top-0 transition-colors duration-200">
       {/* Logo */}
-      <div className="flex float-left w-60 right-[9%] top-[-2%] gap-2.5 px-0 py-0 absolute border-gray-100 dark:border-gray-800">
+      <div className="flex float-left w-60 right-[9%] top-[2%] gap-2.5 px-0 py-0 absolute border-gray-100 dark:border-gray-800">
         <ProvidusLogo />
       </div>
 
