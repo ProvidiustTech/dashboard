@@ -59,7 +59,7 @@ export default function Sidebar() {
           return (
             <Link key={href} href={href}>
               <div
-                className={`flex cursor-pointer h-12 items-center gap-3 px-5 py-2.5 rounded-xl text-md font-medium transition-colors cursor-pointer w-full ${
+                className={`flex h-12 items-center gap-3 px-5 py-2.5 rounded-xl text-md font-medium transition-colors cursor-pointer w-full ${
                   active
                     ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400"
                     : "text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-300"
