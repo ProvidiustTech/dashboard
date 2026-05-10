@@ -41,7 +41,7 @@ export default function ChannelsPage() {
           <div className="w-full mt-16 ">
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 xl:text-center transition-colors duration-200">Connect your support channels</h2>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mb-8 dark:text-white xl:text-center transition-colors duration-200">Add a channel for your&nbsp;business support</p>
+            <p className="text-gray-400 text-sm mb-8 dark:text-white xl:text-center transition-colors duration-200">Add a channel for your&nbsp;business support</p>
 
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 xl:max-w-6xl">
               {CHANNELS.map(({ id, Icon, name, desc, popular }) => {
