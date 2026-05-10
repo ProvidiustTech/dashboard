@@ -423,7 +423,7 @@ function TeamMembersTab() {
   ];
  
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 xl:max-w-3xl">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Team</h2>
@@ -463,7 +463,7 @@ function APIKeysTab() {
   const copy = () => { setCopied(true); setTimeout(() => setCopied(false), 1500); };
  
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 xl:max-w-3xl">
       {/* Warning banner */}
       <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl px-4 py-3.5">
         <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -507,7 +507,7 @@ function APIKeysTab() {
 /* ── Billing tab ── */
 function BillingTab() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 xl:max-w-3xl">
       {/* Dark plan card */}
       <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#0f2a2a] to-[#0a1f2e] p-5 relative">
         {/* Decorative teal blob */}
@@ -845,7 +845,7 @@ function NotificationsTab() {
   );
  
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 xl:max-w-3xl">
       {/* Email Notifications */}
       <div>
         <p className="text-xs font-semibold text-[#14A085] uppercase tracking-wider mb-3">Email Notifications</p>
@@ -918,7 +918,7 @@ export default function SettingsPage() {
         </nav>
 
         {/* Content */}
-        <main className="flex-1 ml-12 overflow-y-auto px-8 py-8 bg-white dark:bg-gray-950 transition-colors duration-200">
+        <main className="flex-1 ml-12 overflow-y-auto px-8 py-8 dark:bg-gray-950 transition-colors duration-200">
           <ActiveComponent />
         </main>
       </div>
@@ -979,8 +979,8 @@ export default function SettingsPage() {
  
       {/* Header */}
       <div 
-      onClick={() => router.back()}
-      className="flex items-center gap-3 px-5 py-4 bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+      onClick={() => setActiveTab("")}
+      className="flex items-center cursor-pointer gap-3 px-5 py-4 bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
         <button
           
           className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"

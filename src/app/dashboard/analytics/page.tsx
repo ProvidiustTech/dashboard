@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
         </div>
       )}
 
-      <div className="mt-10 overflow-scroll xl:overflow-hidden xl:w-[79%] ">
+      <div className="mt-10 overflow-auto xl:overflow-hidden xl:w-[81%] ">
 
 
         <main className="flex-1 mt-8 xl:mt-0 px-6 xl:px-10 py-8">

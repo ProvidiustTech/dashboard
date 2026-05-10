@@ -85,7 +85,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen dark:bg-gray-900 bg-[#F0F2F5] flex items-center justify-center p-4 sm:p-8">
-      <div className="w-[90%] max-w-7xl flex flex-col lg:flex-row gap-6 lg:gap-16 items-center lg:items-stretch">
+      <div className="xl:w-[90%]  max-w-7xl flex flex-col lg:flex-row gap-6 lg:gap-16 items-center lg:items-stretch">
 
         {/* ── LEFT — benefits ─────────────────────────────────────── */}
         <div className="w-full lg:w-[60%] flex flex-col justify-between py-4 lg:py-10 px-2">

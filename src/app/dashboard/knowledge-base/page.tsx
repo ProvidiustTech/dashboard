@@ -300,7 +300,7 @@ export default function KnowledgeBasePage() {
 
       <MobileNav/>
 
-      <div className="w-full xl:w-[76%] px-6 xl:px-6 pt-24 xl:pt-[4.3%] mb-16 xl:mb-0 pb-6 xl:pb-0 overflow-y-auto">
+      <div className="w-full xl:w-[76%] px-6 xl:px-0 pt-24 xl:pt-[4.3%] mb-16 xl:mb-0 pb-6 xl:pb-0 overflow-y-auto">
         {/* Header */}
         <div className="flex flex- xl:flex-row items-start xl:items-center justify-between mb-6 gap-4">
           <div>

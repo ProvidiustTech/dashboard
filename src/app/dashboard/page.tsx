@@ -179,7 +179,7 @@ export default function DashboardPage() {
 
       <MobileNav />
 
-      <main className="flex-1 mt-12 xl:mt-0 px-4 xl:px-0 overflow-y-auto pb-20 xl:pb-0">
+      <main className="flex-1 mt-12 xl:mt-0 px-4 xl:px-7 overflow-y-auto pb-20 xl:pb-0">
         {/* Header */}
         <header className="bg-none px-3 rounded-lg dark:bg-gray-900 mt-9 xl:mt-[3.7%] backdrop-blur-sm xl:border xl:border-b border-none border-gray-100 dark:border-gray-800 xl:px-4 xl:ml-8 xl:w-[95%] py-4 xl:py-5 flex flex-col xl:flex-row items-start xl:items-center justify-between xl:sticky top-0 z-10 xl:rounded-xl transition-colors duration-200 xl:shadow-sm dark:shadow-none">
           <div className="w-full xl:w-auto xl:mb-0">

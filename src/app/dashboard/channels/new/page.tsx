@@ -38,7 +38,7 @@ export default function AddChannelPage() {
 
         {/* Sub-stepper */}
         
-        <div className="block fixed backdrop-blur-sm xl:hidden mt-[-147px] w-[90%] pt-4 h-20 mb-6 xl:mb-8">
+        <div className="block fixed backdrop-blur-sm xl:hidden mt-[-140px] w-[90%] pt-4 h-20 mb-6 xl:mb-8">
                          <StepperIn current={1} />
                        </div>
         <div className="hidden xl:block mb-6 xl:mb-8">

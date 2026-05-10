@@ -164,7 +164,7 @@ export default function AutomationPage() {
 
       {showModal && <NewRuleModal onClose={() => setModal(false)} onSave={(r) => setRules((p) => [...p, r])} />}
 
-      <div className="xl:mt-10 mt-16 overflow-auto w-[100%] min-h-screen xl:overflow-x-hidden mb-10 xl:w-[78%]">
+      <div className="xl:mt-10 mt-16 overflow-auto w-[100%] min-h-screen xl:overflow-x-hidden mb-10 xl:w-[81%]">
         <main className="flex-1 overflow-y-auto px-6 xl:px-10 py-8" onClick={() => setMenuOpen(null)}>
           {/* Header */}
           <div className="flex items-start justify-between mb-8 flex-wrap gap-3">

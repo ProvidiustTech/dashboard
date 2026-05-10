@@ -32,7 +32,7 @@ export default function RuleDetailPage() {
   if (window.history.length > 1) {
     router.back();
   } else {
-    router.push('/dashboard/automation'); // or wherever you want to go
+    router.push('/dashboard/automation/'); // or wherever you want to go
   }
 };
 
@@ -73,7 +73,7 @@ export default function RuleDetailPage() {
 
       <main className="flex-1 overflow-y-auto mt-20 xl:mt-10">
         {/* Top bar */}
-        <header className="bg-none backdrop-blur-sm sticky  border-none px-8 py-4 flex items-center justify-between top-0 z-10">
+        <header className="bg-none backdrop-blur-sm sticky  border-none px-3 py-4 flex items-center justify-between top-0 z-10">
           <div className="flex items-center gap-4">
             <button onClick={handleBack} className="xl:hidden text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors" title="Back to Automation">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -152,7 +152,7 @@ export default function RuleDetailPage() {
           </div>
         </header>
 
-        <div className="px-8 py-6 space-y-5 w-[98%]">
+        <div className="px-5 py-6 space-y-5">
 
           {/* When (Trigger) */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 transition-colors duration-200">
