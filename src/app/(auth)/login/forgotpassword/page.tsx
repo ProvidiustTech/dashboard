@@ -51,7 +51,7 @@ export default function SignInPage() {
       <div className="w-full  bg-white dark:bg-gray-900 h-screen xl:h-[100vh] shadow-2xl overflow-hidden flex flex-col xl:flex-row transition-colors duration-200">
 
         {/* ── Left teal panel ── */}
-        <div className="xl:w-[50%] h-[55vh] xl:h-screen pt-16 bg-[#0D9488] dark:bg-emerald-900 flex flex-col p-8 xl:p-16 xl:px-20 relative overflow-hidden bg-gradient-to-br from-[#0D9488] dark:from-emerald-800 to-[#0D9488]-dark dark:to-emerald-900 transition-colors duration-200">
+        <div className="xl:w-[50%] h-[35vh] xl:h-screen pt-16 bg-[#0D9488] dark:bg-emerald-900 flex flex-col p-8 xl:p-16 xl:px-20 relative overflow-hidden bg-gradient-to-br from-[#0D9488] dark:from-emerald-800 to-[#0D9488]-dark dark:to-emerald-900 transition-colors duration-200">
           {/* Logo */}
           <div className="xl:block ">
             <div className="flex items-center gap-2.5 mb-12">
@@ -75,10 +75,10 @@ export default function SignInPage() {
 
           {/* Placeholder image area with teal overlay feel */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#0D9488]/30 to-[#0D9488]-dark/60" />
-          <img className="xl:w-[92%] mt-8 h-[43%] xl:mt-0 object-cover rounded-xl xl:h-[80%]" src="/dashboard/lady.png" alt="Customer Support Demo" />
+          <img className="xl:w-[92%] hidden xl:block mt-8 h-[43%] xl:mt-0 object-cover rounded-xl xl:h-[80%]" src="/dashboard/lady.png" alt="Customer Support Demo" />
 
           {/* Navigation dots - Mobile and Tablet only */}
-          <div className="xl:hidden absolute top-[65%] right-16 flex gap-2 z-10">
+          <div className="xl:hidden absolute hidden  top-[65%] right-16 gap-2 z-10">
             {mobilestats.map((_, i) => (
               <button
                 key={i}
@@ -95,7 +95,7 @@ export default function SignInPage() {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            className="xl:hidden absolute bottom-3 w-[76%] left-44 transform -translate-x-1/2 flex gap-10 m-8">
+            className="xl:hidden absolute hidden bottom-3 w-[76%] left-44 transform -translate-x-1/2 gap-10 m-8">
             <div className="w-full flex gap-20 transition-transform duration-300 ease-out"
               style={{ transform: `translateX(-${currentSlide * 122}%)` }}
             >
@@ -124,8 +124,8 @@ export default function SignInPage() {
         </div>
 
         {/* ── Right sign-in panel ── */}
-        <div className="flex-1  overflow-y-auto xl:h-screen flex h-[50%] xl:pt-0 pt-40 text-md xl:text-xl flex-col bottom-2 top-[-20px] relative justify-center px-8 sm:px-12 py-14 bg-[#F1F5F9] dark:bg-gray-900 transition-colors duration-200">
-          <h1 className="xl:text-5xl text-lg font-medium dark:text-white xl:relative xl:top-12 text-gray-900 text-center mb-2 tracking-tight">Forgot Password</h1>
+        <div className="flex-1 overflow-y-auto xl:h-screen flex h-[50%] xl:pt-0 pt-0 text-md xl:text-xl flex-col bottom-2 top-[-20px] relative justify-center px-8 sm:px-12 py-14 bg-[#F1F5F9] dark:bg-gray-900 transition-colors duration-200">
+          <h1 className="xl:text-5xl text-3xl mt-14 font-medium dark:text-white xl:relative xl:top-12 text-gray-900 text-center mb-2 tracking-tight">Forgot Password</h1>
 
           <form action="/onboarding/success" className="w-full">
             <div className="space-y-5 max-w-sm w-full mt-0 xl:mt-16 mx-auto">
@@ -149,8 +149,8 @@ export default function SignInPage() {
               <div className="mt-6 text-center space-y-2">
                 <p className="xl:text-lg text-sm dark:text-white text-gray-500">
                  Have an Account?{' '}
-                  <Link href="/" className="text-teal-600 font-semibold hover:underline">
-                    Login in
+                  <Link href="/login" className="text-teal-600 font-semibold hover:underline">
+                  Log in
                   </Link>
                 </p>
               </div>
