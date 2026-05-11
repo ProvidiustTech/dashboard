@@ -65,7 +65,7 @@ export default function SuccessPage() {
 
                 {/* CTA Button */}
                 <Link
-                    href="/dashboard"
+                    href="/login"
                     className={`w-full sm:w-auto inline-flex items-center justify-center
             bg-[#0D9488] hover:bg-[#169A79] active:bg-[#0D9488]
             text-white font-semibold text-base px-10 py-3.5 rounded-2xl
@@ -73,7 +73,7 @@ export default function SuccessPage() {
             transition-all duration-700 delay-600
             ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                 >
-                    Go to Dashboard
+                    Go to Login
                 </Link>
 
                 {/* Helper text */}

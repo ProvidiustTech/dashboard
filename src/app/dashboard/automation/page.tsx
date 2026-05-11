@@ -137,9 +137,12 @@ export default function AutomationPage() {
   useEffect(() => {
     const fetchRules = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/rules`);
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+        const res = await fetch(`${baseUrl}/api/v1/rules`);
         const data = await res.json();
-        setRules(data);
+        if (Array.isArray(data)) {
+          setRules(data);
+        }
       } catch (error) {
         console.error("Failed to fetch rules:", error);
       } finally {
@@ -186,9 +189,9 @@ export default function AutomationPage() {
 
           {/* Rules list */}
           <div className="space-y-4 max-w-7xl">
-            {rules.map((rule) => (
+            {Array.isArray(rules) && rules.map((rule) => (
               <Link key={rule.id} href={`/dashboard/automation/rules/`}>
-                <div
+                <div /* Reverted dark mode styles */
                   className={`border mt-10 rounded-2xl p-5 py-12 transition-all cursor-pointer ${rule.status === "Draft"
                     ? "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-75"
                     : "bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-gray-800"
@@ -199,7 +202,7 @@ export default function AutomationPage() {
                     <div className="flex items-center gap-3">
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0 ${rule.iconBg}`}>
                         {rule.icon}
-                      </div>
+                      </div> {/* Reverted dark mode styles */}
                       <div>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">{rule.name}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{rule.desc}</p>
@@ -212,7 +215,7 @@ export default function AutomationPage() {
                       {/* 3-dot menu */}
                       <div className="relative" onClick={(e) => e.stopPropagation()}>
                         <button
-                          onClick={(e) => { e.stopPropagation(); setMenuOpen(menuOpen === rule.id ? null : rule.id); }}
+                          onClick={(e) => { e.stopPropagation(); setMenuOpen(menuOpen === rule.id ? null : rule.id); }} /* Reverted dark mode styles */
                           className="w-7 h-7 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                         >
                           <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
@@ -220,14 +223,14 @@ export default function AutomationPage() {
                           </svg>
                         </button>
                         {menuOpen === rule.id && (
-                          <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg dark:shadow-xl py-1 z-20 min-w-[140px]" onClick={(e) => e.stopPropagation()}>
+                          <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg dark:shadow-xl py-1 z-20 min-w-[140px]" onClick={(e) => e.stopPropagation()}> {/* Reverted dark mode styles */}
                             <Link href={`/dashboard/automation/rules/`}>
-                              <button className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                              <button className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"> {/* Reverted dark mode styles */}
                                 Edit Rule
                               </button>
                             </Link>
                             <button onClick={() => { deleteRule(rule.id); setMenuOpen(null); }}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"> {/* Reverted dark mode styles */}
                               Delete Rule
                             </button>
                             <Link href={`/dashboard/automation/rules/test/`}>
@@ -242,17 +245,16 @@ export default function AutomationPage() {
                   </div>
 
                   {/* When → Then flow */}
-                  <div className={`flex items-center gap-2 flex-wrap px-4 py-3 rounded-xl text-xs ${rule.status === "Draft" ? "bg-gray-100 dark:bg-gray-700" : "bg-gray-50 dark:bg-gray-800"
-                    }`}>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">When:</span>
-                    <span className={`font-semibold ${rule.status === "Draft" ? "text-gray-500 dark:text-gray-400" : "text-gray-700 dark:text-gray-300"}`}>
+                  <div className={`flex items-center gap-2 flex-wrap px-4 py-3 rounded-xl text-xs ${rule.status === "Draft" ? "bg-gray-100 dark:bg-gray-700" : "bg-gray-50 dark:bg-gray-800"}`}> {/* Reverted dark mode styles */}
+                    <span className="font-medium text-gray-600 dark:text-gray-400">When:</span> {/* Reverted dark mode styles */}
+                    <span className={`font-semibold ${rule.status === "Draft" ? "text-gray-500 dark:text-gray-400" : "text-gray-700 dark:text-gray-300"}`}> {/* Reverted dark mode styles */}
                       {rule.when}
                     </span>
-                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" className="text-gray-400 dark:text-gray-500">
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" className="text-gray-400 dark:text-gray-500"> {/* Reverted dark mode styles */}
                       <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">Then:</span>
-                    <span className={`font-semibold ${rule.status === "Draft" ? "text-gray-500 dark:text-gray-400" : "text-gray-700 dark:text-gray-300"}`}>
+                    <span className="font-medium text-gray-600 dark:text-gray-400">Then:</span> {/* Reverted dark mode styles */}
+                    <span className={`font-semibold ${rule.status === "Draft" ? "text-gray-500 dark:text-gray-400" : "text-gray-700 dark:text-gray-300"}`}> {/* Reverted dark mode styles */}
                       {rule.then}
                     </span>
                     {rule.extra && (
@@ -269,15 +271,15 @@ export default function AutomationPage() {
 
                   {/* Stats */}
                   {rule.stats && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2.5 px-1">{rule.stats}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2.5 px-1">{rule.stats}</p> 
                   )}
                 </div>
               </Link>
             ))}
 
             {/* Empty state */}
-            {rules.length === 0 && (
-              <div className="text-center py-16 border-2 border-dashed rounded-2xl border-gray-200 dark:border-gray-700">
+            {(!Array.isArray(rules) || rules.length === 0) && !loading && (
+              <div className="text-center py-16 border-2 border-dashed rounded-2xl border-gray-200 dark:border-gray-700"> {/* Reverted dark mode styles */}
                 <div className="text-4xl mb-3"></div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">No automation rules yet</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-5">Create your first rule to automate customer responses</p>

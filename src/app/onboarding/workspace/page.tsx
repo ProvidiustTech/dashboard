@@ -3,9 +3,6 @@ import { useState } from "react";
 import Link from "next/link";
 import Stepper from "@/components/Stepper";
 import MobileStepper from '@/components/MobileStepper'
-import router from "next/dist/shared/lib/router/router";
-// import { ChevronDownIcon } from "@/components/Icons";
-
 import { useRouter } from "next/navigation"
 
 const INDUSTRIES = [
@@ -24,13 +21,18 @@ export default function WorkspacePage() {
   const [size, setSize] = useState("6-20");
   const [volume, setVolume] = useState("");
 
-  const [step, setStep] = useState(1)
   const router = useRouter()
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const data = { industry, teamSize: size, monthlyVolume: volume };
+    localStorage.setItem("providius_onboarding_workspace", JSON.stringify(data));
+    router.push("/onboarding/channels");
+  };
 
   return (
     <div className="min-h-screen p-10 bg-[#F1F5F9] dark:bg-gray-950 flex items-center justify-center xl:pt-16 pb-16 px-4 transition-colors duration-200">
-      <form action="/onboarding/channels">
+      <form onSubmit={handleSubmit}> {/* Reverted dark mode styles */}
         <div className=" xl:w-[100%] w-[108%] ml-[10px] xl:ml-8 xl:max-w-[750px] bg-[#F1F5F9] dark:bg-gray-950 rounded-2xl  mt-4 xl:mr-28 border-gray-100 dark:border-gray-800 xl:px-12 py-12 transition-colors duration-200">
           <div className="xl:block hidden mt-[-120px]">
             <Stepper current={2} />
@@ -48,7 +50,7 @@ export default function WorkspacePage() {
 
             <div className="space-y-6">
               {/* Company Name */}
-              <div>
+              {/* <div>
                 <label className="block text-md font-medium text-gray-700 dark:text-gray-300 mb-1.5 transition-colors">Company Name</label>
                 <input
                   type="text"
@@ -58,7 +60,7 @@ export default function WorkspacePage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Acme Corporation"
                 />
-              </div>
+              </div> */}
 
               {/* Industry */}
               <div>

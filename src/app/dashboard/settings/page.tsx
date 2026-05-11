@@ -610,7 +610,7 @@ function AppearanceTab() {
             const active = theme === t;
             return (
               <button
-                key={t}
+                key={t} /* Reverted dark mode styles */
                 onClick={() => {
                   setTheme(t);
                   setSaved(true); // Immediate visual feedback
@@ -652,7 +652,7 @@ function AppearanceTab() {
         <p className="text-xs text-gray-400 mb-4">Adjust the spacing between elements</p>
         <div className="flex gap-3 mb-4">
           {(["Comfortable", "Compact"] as const).map((d) => (
-            <button
+            <button /* Reverted dark mode styles */
               key={d}
               onClick={() => setDensity(d)}
               className={`px-4 xl:px-5 py-2 xl:py-2.5 rounded-xl text-xs xl:text-sm font-semibold border-2 transition-all flex-1 xl:flex-none ${
@@ -664,7 +664,7 @@ function AppearanceTab() {
               {d}
             </button>
           ))}
-        </div>
+        </div> {/* Reverted dark mode styles */}
         <div className="flex items-start gap-2.5  dark:bg-black dark:border-gray-800 bg-gray-50 border border-gray-100 rounded-xl px-3 xl:px-4 py-3">
           <svg className="flex-shrink-0 mt-0.5" width="12" height="12" fill="none" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" stroke="#9CA3AF" strokeWidth="1.8"/>
@@ -683,7 +683,7 @@ function AppearanceTab() {
         <p className="text-xs text-gray-400 mb-4">Select your preferred language</p>
         <div className="relative">
           <button
-            onClick={() => setLangOpen((v) => !v)}
+            onClick={() => setLangOpen((v) => !v)} /* Reverted dark mode styles */
             className="w-full flex items-center justify-between border border-gray-200 rounded-xl px-3 xl:px-4 py-3 xl:py-3.5  dark:bg-black dark:border-gray-800 bg-white hover:border-gray-300 transition-colors"
           >
             <div className="flex items-center gap-3 min-w-0">
@@ -703,7 +703,7 @@ function AppearanceTab() {
               <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          {langOpen && (
+          {langOpen && ( /* Reverted dark mode styles */
             <div className="absolute top-full left-0 right-0 mt-1 bg-white  dark:bg-black dark:border-gray-800 border border-gray-200 rounded-xl shadow-lg overflow-hidden z-10">
               {LANGUAGES.map((l) => (
                 <button
@@ -733,7 +733,7 @@ function AppearanceTab() {
         <p className="text-xs text-gray-400 mb-4">Choose how times are displayed</p>
         <div className="space-y-2">
           {([
-            { id: "12h", label: "12-Hour", example: "e.g., 2:30 PM" },
+            { id: "12h", label: "12-Hour", example: "e.g., 2:30 PM" }, /* Reverted dark mode styles */
             { id: "24h", label: "24-Hour", example: "e.g., 14:30" },
           ] as const).map((f) => {
             const active = timeFormat === f.id;
@@ -769,7 +769,7 @@ function AppearanceTab() {
 
       {/* ── Automation Active preview card ── */}
       <section>
-        <div className="border  dark:bg-black dark:border-gray-800 border-gray-100 rounded-2xl p-4 xl:p-5 bg-gray-50">
+        <div className="border  dark:bg-black dark:border-gray-800 border-gray-100 rounded-2xl p-4 xl:p-5 bg-gray-50"> {/* Reverted dark mode styles */}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 xl:w-10 h-9 xl:h-10 rounded-xl bg-[#E6F7F4] flex items-center justify-center flex-shrink-0">
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24">

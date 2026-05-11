@@ -4,12 +4,12 @@ import Link from "next/link";
 import Stepper from "@/components/Stepper";
 // import { UploadCloudIcon } from "@/components/Icons";
 import MobileStepper from '@/components/MobileStepper'
-import { useRouter } from "next/dist/client/components/navigation";
+import { useRouter } from "next/navigation";
 
-interface UFile { name: string; size: string; ext: string }
+interface UFile { name: string; size: string; ext: string; file?: File }
 
 const EXT_COLORS: Record<string, string> = {
-  PDF: "bg-red-500", DOCX: "bg-blue-500", TXT: "bg-[#F7FAFC]0", MD: "bg-purple-500",
+  PDF: "bg-red-500", DOCX: "bg-blue-500", TXT: "bg-gray-500", MD: "bg-purple-500",
 };
 
 export default function TrainAIPage() {
@@ -17,7 +17,9 @@ export default function TrainAIPage() {
   const [drag, setDrag] = useState(false);
   const [showUrl, setShowUrl] = useState(false);
   const [urlVal, setUrlVal] = useState("");
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const fmt = (b: number) =>
     b < 1024 ? `${b} B` : b < 1048576 ? `${(b / 1024).toFixed(1)} KB` : `${(b / 1048576).toFixed(1)} MB`;
@@ -29,11 +31,90 @@ export default function TrainAIPage() {
         name: f.name,
         size: fmt(f.size),
         ext: f.name.split(".").pop()?.toUpperCase() || "FILE",
+        file: f, // Store the actual File object for upload
       })),
     ]);
 
-  const router = useRouter()
-  const [step, setStep] = useState(1)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    // 1. Gather data from previous steps
+    const workspaceData = JSON.parse(localStorage.getItem("providius_onboarding_workspace") || "{}");
+    const channelsData = JSON.parse(localStorage.getItem("providius_onboarding_channels") || "[]");
+
+    // 2. Build FormData for multi-part submission (files + text)
+    const formData = new FormData();
+    formData.append("industry", workspaceData.industry || "");
+    formData.append("teamSize", workspaceData.teamSize || "");
+    formData.append("monthlyVolume", workspaceData.monthlyVolume || "");
+    formData.append("channels", JSON.stringify(channelsData));
+
+    // 3. Handle Knowledge Base (Files vs URLs)
+    const urls = files.filter(f => f.ext === "URL").map(f => f.name);
+    formData.append("urls", JSON.stringify(urls));
+    
+    files.filter(f => f.file).forEach((f) => {
+      if (f.file) formData.append("files", f.file);
+    });
+
+    // Construct the full URL and ensure we don't have duplicate /api/v1 segments
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+    const apiPath = baseUrl.includes('/api/v1') ? '/onboarding/setup/' : '/api/v1/onboarding/setup/';
+    const fullUrl = `${baseUrl}${apiPath}`;
+
+    const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+    if (!token) {
+      alert("Your session has expired. Please log in again.");
+      router.push('/login');
+      setLoading(false);
+      return;
+    }
+    if (token === 'undefined') { // Handle cases where token might be "undefined" string
+      alert("Authentication token is invalid. Please log in again.");
+      router.push('/login');
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await fetch(fullUrl, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData, // Browser automatically sets content-type to multipart/form-data
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          alert("Your session has expired. Please log in again.");
+          document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'; // Clear cookie
+          router.push('/login');
+          return;
+        }
+        let errorMessage = "Onboarding submission failed";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorData.message || errorMessage;
+        } catch (e) {
+          errorMessage = `${errorMessage} (Status: ${response.status} at ${fullUrl})`;
+        }
+        throw new Error(errorMessage);
+      }
+      
+      // Clear local storage on success
+      localStorage.removeItem("providius_onboarding_workspace");
+      localStorage.removeItem("providius_onboarding_channels");
+      router.push("/onboarding/success");
+    } catch (err) {
+      console.error("Submission Error:", err);
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      alert(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="xl:min-h-screen bg-[#F1F5F9] dark:bg-gray-950 flex transition-colors duration-200 flex-col items-center px-4 pt-20 pb-16">
@@ -44,9 +125,8 @@ export default function TrainAIPage() {
 
         <div className="xl:hidden block relative w-[89%] ml-10 top-[-30px]">
           <MobileStepper current={4} onBack={() => router.back()} />
-
         </div>
-        <form action="/onboarding/success">
+        <form onSubmit={handleSubmit}>
           <div className="w-full pl-10 xl:max-w-[620px] xl:ml-1">
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 transition-colors duration-200">Build Your Knowledge Base</h2>
@@ -59,7 +139,7 @@ export default function TrainAIPage() {
               onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
               onDragLeave={() => setDrag(false)}
               onDrop={(e) => { e.preventDefault(); setDrag(false); if (e.dataTransfer.files) addFiles(e.dataTransfer.files); }}
-              onClick={() => inputRef.current?.click()}
+              onClick={() => !loading && inputRef.current?.click()}
               className={`border-2 border-[#CBD5E1] xl:w-[90%] rounded-2xl p-10 text-center cursor-pointer transition-all duration-150 ${drag ? "border-[#0D9488] bg-[#0D9488]-lighter" : "border-[#CBD5E1] bg-[#F7FAFC] hover:border-gray-300"
                 }`}
             >
@@ -90,7 +170,7 @@ export default function TrainAIPage() {
                 </button>
                 <button
                   type="button"
-                  className="text-xs xl:text-sm text-[#F7FAFC]0 dark:text-black hover:text-gray-700 font-medium transition-colors"
+                  className="text-xs xl:text-sm text-gray-500 dark:text-black hover:text-gray-700 font-medium transition-colors"
                   onClick={() => setShowUrl((v) => !v)}
                 >
                   Import from URL
@@ -101,7 +181,7 @@ export default function TrainAIPage() {
             {/* URL input */}
             {showUrl && (
               <div className="mt-4 xl:w-[90.5%] flex gap-2">
-                <input
+                <input /* Reverted dark mode styles */
                   type="url"
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 bg-white outline-none transition-all focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10 flex-1"
                   placeholder="https://docs.example.com/faq"
@@ -149,14 +229,24 @@ export default function TrainAIPage() {
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-32">
-              <Link href="/onboarding/channels">
-                <button type="button" className="text-[#F7FAFC]0 xl:block hidden hover:text-gray-700 font-medium text-sm transition-colors cursor-pointer">Back</button>
+              <Link href="/onboarding/channels"> {/* Reverted dark mode styles */}
+                <button type="button" className="text-gray-600 xl:block hidden hover:text-gray-900 font-medium text-sm transition-colors cursor-pointer">Back</button>
               </Link>
               <div className="flex items-center gap-3">
-                <Link href="/onboarding/success">
-                  <button type="submit" className="border xl:block hidden border-gray-200 dark:text-black hover:border-gray-300 text-[#F7FAFC]0 hover:text-gray-700 font-medium rounded-xl px-6 py-3 text-sm transition-colors cursor-pointer bg-white">Skip</button>
+                <Link href="/onboarding/success" className="xl:block hidden">
+                  <button type="button" className="border border-gray-200 dark:text-black hover:border-gray-300 text-gray-600 hover:text-gray-700 font-medium rounded-xl px-6 py-3 text-sm transition-colors cursor-pointer bg-white">Skip</button>
                 </Link>
-                <button type="submit" className="bg-[#0D9488] hover:bg-[#0D9488]-dark text-white font-semibold top-8 xl:top-0 xl:ml-2 relative rounded-xl xl:px-8 xl:py-3 px-[153px] ml-[-10px] py-4 text-sm transition-colors cursor-pointer">Continue</button>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="bg-[#0D9488] hover:bg-[#0D9488]-dark text-white font-semibold top-8 xl:top-0 xl:ml-2 relative rounded-xl xl:px-8 xl:py-3 px-[153px] ml-[-10px] py-4 text-sm transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center"
+                >
+                  {loading ? (
+                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    "Continue"
+                  )}
+                </button>
               </div>
             </div>
           </div>

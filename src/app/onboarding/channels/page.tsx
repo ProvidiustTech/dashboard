@@ -3,9 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Stepper from "@/components/Stepper";
 import { CheckIcon, WhatsAppIcon, Telegram, WebChatIcon, EmailIcon, InstagramIcon } from "@/components/Icons";
-import { on } from "process";
 import MobileStepper from '@/components/MobileStepper'
-import router from "next/dist/shared/lib/router/router";
 import { useRouter } from "next/navigation"
 
 const CHANNELS = [
@@ -18,26 +16,28 @@ const CHANNELS = [
 
 export default function ChannelsPage() {
   const [selected, setSelected] = useState<string[]>(["whatsapp"]);
+  const router = useRouter();
 
   const toggle = (id: string) =>
     setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
-  const router = useRouter()
-
-  const [step, setStep] = useState(1)
-
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem("providius_onboarding_channels", JSON.stringify(selected));
+    router.push("/onboarding/train");
+  };
 
   return (
-        <div className="min-h-screen p-10 bg-[#F1F5F9] dark:bg-gray-950 flex items-center justify-center xl:pt-16 pb-16 px-4 transition-colors duration-200">
-      <div className="h-screen  mt-[48px] ">
-        <div className="xl:block hidden ml-[-18px] mt-5">
+    <div className="min-h-screen bg-[#F1F5F9] dark:bg-gray-950 flex flex-col items-center justify-center transition-colors duration-200 px-4 py-16">
+      <div className="w-full max-w-[750px]">
+        <div className="xl:block hidden mt-5">
           <Stepper current={3} />
         </div>
 
-        <div className="xl:hidden z-[9999] block fixed top-[29px]">
+        <div className="xl:hidden block relative mb-8">
                     <MobileStepper current={3} onBack={() => router.back()} />
         </div>
-        <form action="/onboarding/train">
+        <form onSubmit={handleSubmit}>
           <div className="w-full mt-16 ">
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 xl:text-center transition-colors duration-200">Connect your support channels</h2>
@@ -78,14 +78,14 @@ export default function ChannelsPage() {
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-10">
-              <Link href="/onboarding/channels">
-                <button type="button" className="text-[#F7FAFC]0 xl:block hidden hover:text-gray-700 font-medium text-sm transition-colors cursor-pointer">Back</button>
+              <Link href="/onboarding/workspace">
+                <button type="button" className="text-gray-600 xl:block hidden hover:text-gray-900 font-medium text-sm transition-colors cursor-pointer">Back</button>
               </Link>
               <div className="flex items-center gap-3">
-                <Link href="/dashboard">
-                  <button type="submit" className="border xl:block hidden border-gray-200 dark:text-black hover:border-gray-300 text-[#F7FAFC]0 hover:text-gray-700 font-medium rounded-xl px-6 py-3 text-sm transition-colors cursor-pointer bg-white">Skip</button>
+                <Link href="/dashboard" className="xl:block hidden">
+                  <button type="button" className="border border-gray-200 dark:text-black hover:border-gray-300 text-gray-600 hover:text-gray-700 font-medium rounded-xl px-6 py-3 text-sm transition-colors cursor-pointer bg-white">Skip</button>
                 </Link>
-                <button type="submit" className="bg-[#0D9488]  mb-9 ml-[-40px] xl:ml-3 hover:bg-[#0D9488]-dark xl:mt- mt-8 text-white font-semibold rounded-xl xl:px-8 xl:py-3 px-[153px] py-4 text-sm transition-colors cursor-pointer">Continue</button>
+                <button type="submit" className="bg-[#0D9488]  mb-9 ml-[-40px] xl:ml-3 hover:bg-[#0D9488]-dark xl:mt-0 mt-8 text-white font-semibold rounded-xl xl:px-8 xl:py-3 px-[153px] py-4 text-sm transition-colors cursor-pointer">Continue</button>
               </div>
             </div>
           </div>

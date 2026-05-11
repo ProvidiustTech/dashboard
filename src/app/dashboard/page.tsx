@@ -2,8 +2,8 @@
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
 import { ExportIcon, PlusIcon } from "@/components/Icons";
-import Link from "next/link";
-import { useMemo } from "react";
+import Link from "next/link"; 
+import { useMemo, useState, useEffect } from "react";
 
 /* ── Static data (replace with API calls) ── */
 
@@ -168,7 +168,38 @@ const percentColorClass = percentChangeRaw >= 0 ? 'text-[#0D9488] dark:text-emer
 
 
 export default function DashboardPage() {
-  const { text: greetingText, emoji } = useGreeting("Stark");
+  const [companyName, setCompanyName] = useState<string | null>(null); // Initialize as null
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+      if (!token || token === 'undefined') {
+        setCompanyName("User");
+        return;
+      }
+
+      try {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+        const res = await fetch(`${baseUrl}/api/v1/auth/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          // The backend returns the full_name as "company" in the /me response
+          setCompanyName(data.company || "User");
+        } else {
+          setCompanyName("User");
+        }
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+        setCompanyName("User");
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Only render the greeting once companyName is resolved
+  const { text: greetingText, emoji } = useGreeting(companyName || ""); // Pass empty string until companyName is loaded
   return (
     <div className="flex flex-col xl:flex-row h-screen bg-[#F7FAFC] dark:bg-gray-950 overflow-hidden transition-colors duration-200">
       <div className="hidden xl:block">
@@ -183,7 +214,11 @@ export default function DashboardPage() {
         {/* Header */}
         <header className="bg-none px-3 rounded-lg dark:bg-gray-900 mt-9 xl:mt-[3.7%] backdrop-blur-sm xl:border xl:border-b border-none border-gray-100 dark:border-gray-800 xl:px-4 xl:ml-8 xl:w-[95%] py-4 xl:py-5 flex flex-col xl:flex-row items-start xl:items-center justify-between xl:sticky top-0 z-10 xl:rounded-xl transition-colors duration-200 xl:shadow-sm dark:shadow-none">
           <div className="w-full xl:w-auto xl:mb-0">
-            <h1 className="text-xl xl:text-2xl font-bold text-gray-900 dark:text-white">{greetingText} <span>{emoji}</span></h1>
+            {companyName !== null ? ( // Only render greeting if companyName is resolved
+              <h1 className="text-xl xl:text-2xl font-bold text-gray-900 dark:text-white">{greetingText} <span>{emoji}</span></h1>
+            ) : (
+              <h1 className="text-xl xl:text-2xl font-bold text-gray-900 dark:text-white">Loading...</h1> // Or a spinner
+            )}
             <p className="text-xs xl:text-sm text-gray-500 dark:text-gray-400 mt-0.5">{"Here's what's happening with your support today"}</p>
           </div>
           <div className="flex items-center gap-2 xl:gap-3 w-full xl:w-auto">

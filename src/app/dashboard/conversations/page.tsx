@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Paperclip, Send, X, ChevronDown, Plus } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
@@ -74,32 +74,24 @@ const AI_MSGS = [
   },
 ];
 
-const HUMAN_MSGS = [
-  {
-    from: "ai",
-    text: "Thanks! I found your order #12847. It's currently in transit and expected to arrive tomorrow by 5 PM. Here's the tracking link: track.providius.io/12847",
-    time: "10:33 AM",
-    conf: "88% confidence",
-    sources: ["Order Database", "Shipping Policy"],
-  },
-  {
-    from: "human",
-    text: "Hi Emma, this is Stark I've taken over the chat. I can see your order #12847 is currently being processed at our warehouse. I'll expedite this for you right now.",
-    time: "10:32 AM",
-    agent: "Stark Jenkins",
-  },
-];
-
 /* ── Escalate Modal ─────────────────────────────────────────────────────── */
 function EscalateModal({
   onClose,
   onEscalate,
+  companyName,
 }: {
   onClose: () => void;
   onEscalate: () => void;
+  companyName: string;
 }) {
-  const [agent, setAgent] = useState("Stark Jenkins (Support Lead)");
+  const [agent, setAgent] = useState(`${companyName} (Support Lead)`);
   const [note, setNote] = useState("");
+
+  // Update agent if companyName changes
+  useEffect(() => {
+    setAgent(`${companyName} (Support Lead)`);
+  }, [companyName]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
@@ -124,7 +116,7 @@ function EscalateModal({
               onChange={(e) => setAgent(e.target.value)}
               className="w-full px-4 py-3 text-sm borderborder-none rounded-xl outline-none focus:border-emerald-600 dark:focus:border-emerald-400 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white appearance-none pr-10 transition-colors"
             >
-              <option>Stark Jenkins (Support Lead)</option>
+              <option>{companyName} (Support Lead)</option>
               <option>Mike Chen (Technical Lead)</option>
               <option>Emma Wilson (Senior Agent)</option>
             </select>
@@ -176,8 +168,52 @@ export default function ConversationsPage() {
   const [escalated, setEscalated] = useState(false);
   const [note, setNote] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState("User");
 
-  const msgs = escalated ? HUMAN_MSGS : AI_MSGS;
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+      if (!token || token === 'undefined') {
+        setCompanyName("User");
+        return;
+      }
+
+      try {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+        const res = await fetch(`${baseUrl}/api/v1/auth/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCompanyName(data.company || "User");
+        } else {
+          setCompanyName("User");
+        }
+      } catch (err) {
+        console.error("Failed to fetch user profile for conversations:", err);
+        setCompanyName("User");
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const humanMsgs = [
+    {
+      from: "ai",
+      text: "Thanks! I found your order #12847. It's currently in transit and expected to arrive tomorrow by 5 PM. Here's the tracking link: track.providius.io/12847",
+      time: "10:33 AM",
+      conf: "88% confidence",
+      sources: ["Order Database", "Shipping Policy"],
+    },
+    {
+      from: "human",
+      text: `Hi Emma, this is ${companyName}. I've taken over the chat. I can see your order #12847 is currently being processed at our warehouse. I'll expedite this for you right now.`,
+      time: "10:32 AM",
+      agent: companyName,
+    },
+  ];
+
+  const msgs = escalated ? humanMsgs : AI_MSGS;
   const selectedConvo = selectedId ? CONVOS.find((c) => c.id === selectedId) : null;
 
   function handleEscalate() {
@@ -361,9 +397,9 @@ export default function ConversationsPage() {
                 </span>
                 <div className="flex items-center gap-1 xl:gap-2 text-xs xl:text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">
                   <div className="w-6 h-6 xl:w-7 xl:h-7 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-[9px] xl:text-xs font-bold transition-colors">
-                    SJ
+                    {companyName.charAt(0).toUpperCase()}
                   </div>
-                  <span className="hidden xl:inline">Stark Jenkins</span>
+                  <span className="hidden xl:inline">{companyName}</span>
                 </div>
               </>
             ) : (
@@ -486,7 +522,7 @@ export default function ConversationsPage() {
                 </div>
                 <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 xl:px-4 py-2 xl:py-2.5 transition-colors">
                   <input
-                    placeholder="Type as Stark Jenkins..."
+                    placeholder={`Type as ${companyName}...`}
                     value={compose}
                     onChange={(e) => setCompose(e.target.value)}
                     className="flex-1 bg-transparent text-xs xl:text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-colors"
@@ -507,6 +543,7 @@ export default function ConversationsPage() {
             <EscalateModal
               onClose={() => setShowEscalate(false)}
               onEscalate={handleEscalate}
+              companyName={companyName}
             />
           )}
         </div>

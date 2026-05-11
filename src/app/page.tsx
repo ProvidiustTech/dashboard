@@ -58,17 +58,20 @@ export default function RegisterPage() {
         body: JSON.stringify(dataToSubmit),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        let errorMessage = 'Registration failed';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.detail || errorMessage;
-        } catch {
-          errorMessage = `Server Error: ${response.status} ${response.statusText}`;
-        }
-        throw new Error(errorMessage);
+        throw new Error(data.detail || 'Registration failed');
       }
-      
+
+      // Save token if registration automatically logs the user in
+      if (data.access_token) {
+        document.cookie = `access_token=${data.access_token}; path=/; max-age=${data.expires_in || 3600}; SameSite=Lax`; // Set cookie
+        if (data.full_name) {
+          document.cookie = `company_name=${encodeURIComponent(data.full_name)}; path=/; max-age=${data.expires_in || 3600}; SameSite=Lax`;
+        }
+      }
+
       router.push('/onboarding/workspace');
     } catch (err) {
       setErrors({ submit: err instanceof Error ? err.message : 'Could not connect to the server. Please check if the backend is running.' });
@@ -119,7 +122,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Bottom tip */}
-          <div className="mt-10 border border-gray-200 rounded-2xl px-5 py-4 bg-white xl:text-sm text-xs text-gray-500 leading-relaxed">
+          <div className="mt-10 border border-gray-200 rounded-2xl px-5 py-4 bg-white xl:text-sm text-xs text-gray-500 leading-relaxed"> {/* Reverted dark mode styles */}
             Did you know? Early users of{' '}
             <span className="text-teal-600 font-semibold">Providiustech V1</span>{' '}
             get priority access to new technologies in our AI features and integrations as we roll them out.
@@ -127,7 +130,7 @@ export default function RegisterPage() {
         </div>
 
         {/* ── RIGHT — form card ────────────────────────────────────── */}
-        <div className="w-full lg:w-[65%] bg-white dark:bg-gray-900 dark:border dark:border-gray-600 rounded-2xl shadow-sm px-8 sm:px-12 py-10 sm:py-12 flex flex-col justify-center">
+        <div className="w-full lg:w-[65%] bg-white dark:bg-gray-900 dark:border dark:border-gray-600 rounded-2xl shadow-sm px-8 sm:px-12 py-10 sm:py-12 flex flex-col justify-center"> {/* Reverted dark mode styles */}
           <h1 className="xl:text-5xl text-3xl font-medium dark:text-white text-gray-900 text-center mb-2 tracking-tight">
             Get Started
           </h1>
@@ -144,7 +147,7 @@ export default function RegisterPage() {
               </label>
               <input
                 type="text"
-                placeholder="company name here"
+                placeholder="Company name here"
                 value={form.company}
                 onChange={set('company')}
                 onFocus={() => setFocused('company')}

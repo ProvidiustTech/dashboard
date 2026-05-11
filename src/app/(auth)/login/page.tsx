@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 // import { ProvidusLogo } from "@/components/Icons";
 
 export default function SignInPage() {
@@ -11,6 +12,10 @@ export default function SignInPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const stats = [
     { val: "98%", label: "Resolution Rate" },
@@ -42,6 +47,39 @@ export default function SignInPage() {
     }
     if (isRightSwipe && currentSlide > 0) {
       setCurrentSlide(currentSlide - 1);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+    const loginUrl = `${baseUrl}/api/v1/auth/login`;
+    
+    try {
+      const response = await fetch(loginUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Login failed. Please check your credentials.');
+      }
+
+      document.cookie = `access_token=${data.access_token}; path=/; max-age=${data.expires_in || 3600}; SameSite=Lax`; // Set cookie
+      if (data.full_name) {
+        document.cookie = `company_name=${encodeURIComponent(data.full_name)}; path=/; max-age=${data.expires_in || 3600}; SameSite=Lax`;
+      }
+      router.push('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not connect to the server.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,8 +166,11 @@ export default function SignInPage() {
           <h1 className="xl:text-5xl text-3xl mt-14 font-medium dark:text-white xl:relative xl:top-12 text-gray-900 text-center mb-2 tracking-tight">Welcome back!</h1>
           <p className="text-gray-400 dark:text-gray-500 text-sm xl:text-lg xl:top-14 relative mb-9 text-center transition-colors">Sign in to your workspace</p>
 
-          <form action="/onboarding/success" className="w-full">
+          <form onSubmit={handleSubmit} className="w-full">
             <div className="space-y-5 max-w-sm w-full mt-0 xl:mt-16 mx-auto">
+              {error && (
+                <p className="text-sm text-red-500 text-center font-medium bg-red-50 dark:bg-red-900/20 py-2 rounded-lg">{error}</p>
+              )}
               <div>
                 <label className="block xl:text-lg font-medium text-gray-700 dark:text-gray-300 mb-5 transition-colors">Email</label>
                 <input
@@ -176,7 +217,7 @@ export default function SignInPage() {
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
+                  <input /* Reverted dark mode styles */
                     type="checkbox"
                     checked={remember}
                     onChange={(e) => setRemember(e.target.checked)}
@@ -189,7 +230,18 @@ export default function SignInPage() {
                 </a>
               </div>
 
-              <button type="submit" className="w-full bg-[#0D9488] dark:bg-[#0D9488] hover:bg-[#0a7e74] dark:hover:bg-[#0a7e74] mt-8 text-white font-medium text-xl rounded-2xl px-6 transition-colors cursor-pointer py-3 xl:py-4 disabled:opacity-70">Sign In</button>
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-[#0D9488] dark:bg-[#0D9488] hover:bg-[#0a7e74] dark:hover:bg-[#0a7e74] mt-8 text-white font-medium text-xl rounded-2xl px-6 transition-colors cursor-pointer py-3 xl:py-4 disabled:opacity-70 flex items-center justify-center gap-2"
+              >
+                {loading && (
+                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12"/>
+                  </svg>
+                )}
+                {loading ? 'Signing in...' : 'Sign In'}
+              </button>
 
 
               <div className="mt-6 text-center space-y-2">

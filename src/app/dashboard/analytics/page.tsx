@@ -70,7 +70,7 @@ export default function AnalyticsPage() {
               {/* Date Range */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">Date Range</label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3"> {/* Reverted dark mode styles */}
                   <div className="relative">
                     <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" width="14" height="14" fill="none" viewBox="0 0 24 24">
                       <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.8" />
@@ -93,7 +93,7 @@ export default function AnalyticsPage() {
               {/* Data Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">Date Type</label>
-                <div className="relative">
+                <div className="relative"> {/* Reverted dark mode styles */}
                   <select value={dataType} onChange={(e) => setDataType(e.target.value)}
                     className="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-600 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-600/10 dark:focus:ring-emerald-500/20 appearance-none pr-10 transition-colors">
                     <option>Resolution Metrics</option>
@@ -111,7 +111,7 @@ export default function AnalyticsPage() {
               {/* Format */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">Format</label>
-                <div className="flex gap-3">
+                <div className="flex gap-3"> {/* Reverted dark mode styles */}
                   {(["CSV", "PDF"] as const).map((f) => (
                     <button
                       key={f}
@@ -166,7 +166,7 @@ export default function AnalyticsPage() {
               <select
                 value={range}
                 onChange={(e) => setRange(e.target.value)}
-                className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl px-4 py-2 text-sm text-gray-600 dark:text-gray-400 outline-none focus:border-emerald-600 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-600/10 dark:focus:ring-emerald-500/20 cursor-pointer transition-colors"
+                className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl px-4 py-2 text-sm text-gray-600 dark:text-gray-400 outline-none focus:border-emerald-600 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-600/10 dark:focus:ring-emerald-500/20 cursor-pointer transition-colors" /* Reverted dark mode styles */
               >
                 {RANGES.map((r) => <option key={r}>{r}</option>)}
               </select>
@@ -183,7 +183,7 @@ export default function AnalyticsPage() {
 
               {/* Resolution Rate Over Time */}
               <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm dark:shadow-none transition-colors duration-200">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5 transition-colors">Resolution Rate Over Time</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5 transition-colors">Resolution Rate Over Time</h3> {/* Reverted dark mode styles */}
                 <div className="flex gap-3 items-end">
                   {/* Y-axis */}
                   <div className="flex flex-col justify-between text-[10px] text-gray-300 dark:text-gray-600 text-right pb-5 transition-colors" style={{ height: 140 }}>
@@ -214,7 +214,7 @@ export default function AnalyticsPage() {
 
               {/* Conversation Volume */}
               <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm dark:shadow-none transition-colors duration-200">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5 transition-colors">Conversation Volume</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5 transition-colors">Conversation Volume</h3> {/* Reverted dark mode styles */}
                 <div className="flex gap-3 items-end">
                   {/* Y-axis */}
                   <div className="flex flex-col justify-between text-[10px] text-gray-300 dark:text-gray-600 text-right pb-5 transition-colors" style={{ height: 140 }}>
@@ -249,12 +249,12 @@ export default function AnalyticsPage() {
                 {/* Legend */}
                 <div className="flex items-center gap-4 mt-3">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-sm bg-emerald-600 dark:bg-emerald-500" />
+                    <div className="w-3 h-3 rounded-sm bg-emerald-600 dark:bg-emerald-500" /> {/* Reverted dark mode styles */}
                     <span className="text-xs text-gray-500 dark:text-gray-600 transition-colors">AI Resolved</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-sm bg-red-400 dark:bg-red-500" />
-                    <span className="text-xs text-gray-500 dark:text-gray-600 transition-colors">Escalated</span>
+                    <div className="w-3 h-3 rounded-sm bg-red-400 dark:bg-red-500" /> {/* Reverted dark mode styles */}
+                    <span className="text-xs text-gray-500 dark:text-gray-600 transition-colors">Escalated</span> {/* Reverted dark mode styles */}
                   </div>
                 </div>
               </div>
@@ -265,10 +265,10 @@ export default function AnalyticsPage() {
 
               {/* Escalation Insights */}
               <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm dark:shadow-none transition-colors duration-200">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 transition-colors">Escalation Insights</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 transition-colors">Escalation Insights</h3> {/* Reverted dark mode styles */}
                 <div className="space-y-3">
                   {ESCALATION.map(({ label, pct }) => (
-                    <div key={label} className="flex items-center justify-between">
+                    <div key={label} className="flex items-center justify-between"> {/* Reverted dark mode styles */}
                       <span className="text-sm text-gray-600 dark:text-gray-400 transition-colors">{label}</span>
                       <span className="text-sm font-semibold text-gray-900 dark:text-white transition-colors">{pct}%</span>
                     </div>
@@ -281,10 +281,10 @@ export default function AnalyticsPage() {
 
               {/* Top Knowledge Sources */}
               <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm dark:shadow-none transition-colors duration-200">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 transition-colors">Top Knowledge Sources</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 transition-colors">Top Knowledge Sources</h3> {/* Reverted dark mode styles */}
                 <div className="space-y-3">
                   {TOP_KB.map(({ label, count, color }) => (
-                    <div key={label} className="flex items-center justify-between">
+                    <div key={label} className="flex items-center justify-between"> {/* Reverted dark mode styles */}
                       <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${color === "bg-[#14A085]" ? "bg-emerald-600 dark:bg-emerald-500" : "bg-amber-400 dark:bg-amber-500"}`} />
                         <span className="text-sm text-gray-600 dark:text-gray-400 transition-colors">{label}</span>
@@ -297,7 +297,7 @@ export default function AnalyticsPage() {
 
               {/* Customer Satisfaction */}
               <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm dark:shadow-none flex flex-col items-center justify-center transition-colors duration-200">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 self-start transition-colors">Customer Satisfaction</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 self-start transition-colors">Customer Satisfaction</h3> {/* Reverted dark mode styles */}
                 <p className="text-5xl font-bold text-gray-900 dark:text-white mb-2 transition-colors">4.6</p>
                 <div className="flex gap-0.5 mb-2">
                   {[1, 2, 3, 4].map((s) => (
@@ -322,7 +322,7 @@ export default function AnalyticsPage() {
 
             {/* Row 3 — Response Time Distribution */}
             <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm dark:shadow-none transition-colors duration-200">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Response Time Distribution</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Response Time Distribution</h3> {/* Reverted dark mode styles */}
               <div className="flex items-end gap-4 justify-around">
                 {RESPONSE_DIST.map(({ label, pct, color }) => (
                   <div key={label} className="flex flex-col items-center gap-2 flex-1">
@@ -338,7 +338,7 @@ export default function AnalyticsPage() {
             </div>
 
             {/* AI Smart Insights */}
-            <div className="rounded-2xl mt-7 bg-gradient-to-br from-gray-900 to-gray-950 dark:from-gray-900 dark:to-gray-950 p-6 transition-colors duration-200">
+            <div className="rounded-2xl mt-7 bg-gradient-to-br from-gray-900 to-gray-950 dark:from-gray-900 dark:to-gray-950 p-6 transition-colors duration-200"> {/* Reverted dark mode styles */}
               <div className="flex items-center gap-2 mb-5">
                 <span className="text-base"></span>
                 <h3 className="text-base font-semibold text-white">AI Smart Insights</h3>
@@ -347,7 +347,7 @@ export default function AnalyticsPage() {
                 {[
                   { priority: "High Priority", priorityColor: "bg-red-500/20 text-red-400", icon: "/analytics/risingicon.svg", title: "Escalations increased by 15% this week.", body: 'Most users are asking about "International Shipping" which isn\'t in your KB.' },
                   { priority: "Medium", priorityColor: "bg-yellow-500/20 text-yellow-400", icon: "/analytics/mediumicon.svg", title: 'Improve "Return FAQ" document.', body: "AI confidence is dropping for return-related queries. Update policy details." },
-                  { priority: "Low", priorityColor: "bg-green-500/20 text-green-400", icon: "/analytics/peakicon.svg", title: "Peak activity detected at 2 PM.", body: "Consider increasing human agent availability during this window for escalations." },
+                  { priority: "Low", priorityColor: "bg-green-500/20 text-green-400", icon: "/analytics/peakicon.svg", title: "Peak activity detected at 2 PM.", body: "Consider increasing human agent availability during this window for escalations." }, /* Reverted dark mode styles */
                 ].map((insight) => (
                   <div key={insight.title} className="bg-white/5 dark:bg-white/5 rounded-xl p-4 border border-white/10 dark:border-white/10 transition-colors">
                     <div className="flex items-center justify-between mb-3">

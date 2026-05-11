@@ -32,7 +32,7 @@ export default function RuleDetailPage() {
   if (window.history.length > 1) {
     router.back();
   } else {
-    router.push('/dashboard/automation/'); // or wherever you want to go
+    router.push('/dashboard/automation'); // or wherever you want to go
   }
 };
 
@@ -61,7 +61,7 @@ export default function RuleDetailPage() {
     alert("Rule deleted successfully!");
 
     // Redirect back to rules list after deletion
-    router.push("/dashboard/automation");
+    router.push("/dashboard/automation/");
   };
 
 
@@ -157,7 +157,7 @@ export default function RuleDetailPage() {
           {/* When (Trigger) */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 transition-colors duration-200">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center text-base"></div>
+              <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center text-base"></div> {/* Reverted dark mode styles */}
               <h2 className="text-base font-semibold text-gray-900 dark:text-white transition-colors duration-200">When (Trigger)</h2>
             </div>
             <div className="grid grid-cols-2 gap-5">
@@ -165,7 +165,7 @@ export default function RuleDetailPage() {
                 <label className="block text-xs font-medium dark:text-white text-gray-500 mb-1.5">Trigger Type</label>
                 <input
                   value={triggerType}
-                  onChange={(e) => setTrigger(e.target.value)}
+                  onChange={(e) => setTrigger(e.target.value)} /* Reverted dark mode styles */
                   className="w-full border border-gray-200 dark:bg-gray-400 dark:border-none rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#14A085] focus:ring-2 focus:ring-[#14A085]/10"
                 />
               </div>
@@ -173,7 +173,7 @@ export default function RuleDetailPage() {
                 <label className="block text-xs font-medium dark:text-white text-gray-500 mb-1.5">Intent Name</label>
                 <input
                   value={intentName}
-                  onChange={(e) => setIntent(e.target.value)}
+                  onChange={(e) => setIntent(e.target.value)} /* Reverted dark mode styles */
                   className="w-full border  dark:bg-gray-400 dark:border-none border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#14A085] focus:ring-2 focus:ring-[#14A085]/10"
                 />
               </div>
@@ -182,7 +182,7 @@ export default function RuleDetailPage() {
 
           {/* Then (Actions) */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 transition-colors duration-200">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-5"> {/* Reverted dark mode styles */}
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
                   <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
@@ -198,7 +198,7 @@ export default function RuleDetailPage() {
             </div>
 
             {/* API config card */}
-            <div className="border dark:border-gray-600 border-gray-100 rounded-xl overflow-hidden">
+            <div className="border dark:border-gray-600 border-gray-100 rounded-xl overflow-hidden"> {/* Reverted dark mode styles */}
               <div className="flex items-center justify-between px-5 py-3 dark:border-none dark:bg-gray-600 bg-gray-50 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded bg-gray-400 flex items-center justify-center">
@@ -217,13 +217,13 @@ export default function RuleDetailPage() {
                 {/* Method + URL */}
                 <div className="flex gap-3">
                   <select
-                    value={method}
-                    onChange={(e) => setMethod(e.target.value)}
-                    className="border  dark:bg-gray-400 dark:border-none border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 outline-none focus:border-[#14A085] bg-white"
+                    value={method} /* Reverted dark mode styles */
+                    onChange={(e) => setMethod(e.target.value)} /* Reverted dark mode styles */
+                    className="border  dark:bg-gray-400 dark:border-none border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 outline-none focus:border-[#14A085] bg-white" /* Reverted dark mode styles */
                   >
                     <option>POST</option><option>GET</option><option>PUT</option><option>DELETE</option>
                   </select>
-                  <input
+                  <input /* Reverted dark mode styles */
                     value={apiUrl}
                     onChange={(e) => setApiUrl(e.target.value)}
                     className="flex-1  dark:bg-gray-400 dark:border-none border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#14A085] focus:ring-2 focus:ring-[#14A085]/10"
@@ -233,10 +233,10 @@ export default function RuleDetailPage() {
                 {/* Headers + Params */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs font-medium dark:text-white text-gray-500 mb-2">Headers</p>
-                    <div className="bg-gray-50  dark:bg-gray-400 dark:border-none rounded-xl p-3 space-y-1">
-                      <p className="text-xs dark:text-white text-gray-600 font-mono">Authorization: Bearer {"{api_key}"}</p>
-                      <p className="text-xs dark:text-white text-gray-600 font-mono">Content-Type: application/json</p>
+                    <p className="text-xs font-medium dark:text-white text-gray-500 mb-2">Headers</p> {/* Reverted dark mode styles */}
+                    <div className="bg-gray-50  dark:bg-gray-400 dark:border-none rounded-xl p-3 space-y-1"> {/* Reverted dark mode styles */}
+                      <p className="text-xs dark:text-white text-gray-600 font-mono">Authorization: Bearer {"{api_key}"}</p> {/* Reverted dark mode styles */}
+                      <p className="text-xs dark:text-white text-gray-600 font-mono">Content-Type: application/json</p> {/* Reverted dark mode styles */}
                     </div>
                   </div>
                   <div>
@@ -261,7 +261,7 @@ export default function RuleDetailPage() {
           </div>
 
           {/* Execution Logs */}
-          <div className="bg-white dark:bg-gray-900 dark:border-none rounded-2xl border-gray-100 p-6">
+          <div className="bg-white dark:bg-gray-900 dark:border-none rounded-2xl border-gray-100 p-6"> {/* Reverted dark mode styles */}
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-base font-semibold text-gray-900 dark:text-white transition-colors duration-200">Execution Logs</h2>
               <button className="text-sm font-medium text-gray-500 dark:border-none hover:text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 transition-colors">
@@ -274,7 +274,7 @@ export default function RuleDetailPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b dark:border-none border-gray-100">
-                    {["Timestamp", "Input Query", "AI Response", "Status", "Action"].map((h) => (
+                    {["Timestamp", "Input Query", "AI Response", "Status", "Action"].map((h) => ( /* Reverted dark mode styles */
                       <th key={h} className="text-left text-xs font-medium dark:text-white text-gray-400 pb-3 pr-4">{h}</th>
                     ))}
                   </tr>
@@ -282,9 +282,9 @@ export default function RuleDetailPage() {
                 <tbody className="divide-y dark:divide-none divide-gray-50">
                   {LOGS.map((log, i) => (
                     <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors">
-                      <td className="py-3 pr-4 text-xs dark:text-gray-300 text-gray-500 whitespace-nowrap">{log.ts}</td>
-                      <td className="py-3 pr-4 text-xs dark:text-gray-400 text-gray-700">{log.query}</td>
-                      <td className="py-3 pr-4 text-xs dark:text-gray-300 text-gray-500">{log.response}</td>
+                      <td className="py-3 pr-4 text-xs dark:text-gray-300 text-gray-500 whitespace-nowrap">{log.ts}</td> {/* Reverted dark mode styles */}
+                      <td className="py-3 pr-4 text-xs dark:text-gray-400 text-gray-700">{log.query}</td> {/* Reverted dark mode styles */}
+                      <td className="py-3 pr-4 text-xs dark:text-gray-300 text-gray-500">{log.response}</td> {/* Reverted dark mode styles */}
                       <td className="py-3 pr-4">
                         <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${log.status === "Success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
                           }`}>

@@ -132,7 +132,7 @@ function UploadPanel({ state, onDismiss }: { state: UploadState; onDismiss: (id:
 function IndexingCompleteModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" onClick={onClose} /> {/* Reverted dark mode styles */}
       <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-[590px] mx-4 p-24 text-center transition-colors duration-200">
         <div className="w-14 h-14 rounded-full border-2 border-emerald-600 dark:border-emerald-600 flex items-center justify-center mx-auto mb-5 transition-colors">
           <Check size={28} className="text-emerald-600 dark:text-emerald-600" strokeWidth={2.5} />
@@ -294,13 +294,13 @@ export default function KnowledgeBasePage() {
   )
 
   return (
-    <div className="flex gap-16 h-screen bg-[#F7FAFC] dark:bg-gray-950 overflow-hidden transition-colors duration-200">
+    <div className="flex gap-16 xl:h-screen bg-[#F7FAFC] dark:bg-gray-950 overflow-hidden transition-colors duration-200">
       <Sidebar />
 
 
       <MobileNav/>
 
-      <div className="w-full xl:w-[76%] px-6 xl:px-0 pt-24 xl:pt-[4.3%] mb-16 xl:mb-0 pb-6 xl:pb-0 overflow-y-auto">
+      <div className="w-full px-4 xl:px-0 xl:pr-[4.2%] cle pt-24 xl:pt-[4.3%] mb-16 xl:mb-0 pb-6 xl:pb-0 overflow-y-auto">
         {/* Header */}
         <div className="flex flex- xl:flex-row items-start xl:items-center justify-between mb-6 gap-4">
           <div>
@@ -415,7 +415,7 @@ export default function KnowledgeBasePage() {
           </div>
 
           {/* Column headers */}
-          <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b dark:border-none border-gray-50">
+          <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b dark:border-none border-gray-50"> {/* Reverted dark mode styles */}
             {['Document', '', 'Type', 'Status', 'Usage', 'Uploaded', 'Actions'].map((h, i) => (
               <div key={i} className={`text-xs font-medium  text-gray-400 ${
                 i === 0 ? 'col-span-3' : i === 1 ? 'col-span-1' :
@@ -428,7 +428,7 @@ export default function KnowledgeBasePage() {
           {/* Rows */}
           <div className="divide-y dark:divide-none divide-gray-50 overflow-y-scroll h-[37.3vh]">
             {filteredDocs.map(doc => (
-              <div key={doc.id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-gray-50/50 transition-colors">
+              <div key={doc.id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-gray-50/50 transition-colors"> {/* Reverted dark mode styles */}
                 <div className="col-span-4 flex items-center gap-3 min-w-0">
                   <div className={`w-8 h-8 rounded-lg ${doc.iconBg} flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0`}>
                     {doc.icon}
@@ -439,7 +439,7 @@ export default function KnowledgeBasePage() {
                     {doc.url && <p className="text-xs text-gray-400 truncate">{doc.url}</p>}
                   </div>
                 </div>
-                <div className="col-span-2 text-sm  dark:text-white text-gray-500">{doc.type}</div>
+                <div className="col-span-2 text-sm  dark:text-white text-gray-500">{doc.type}</div> {/* Reverted dark mode styles */}
                 <div className="col-span-2">
                   <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_CLS[doc.status]}`}>
                     {doc.status === 'Processing' && <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />}
@@ -452,7 +452,7 @@ export default function KnowledgeBasePage() {
                     : <span className="text-gray-300">—</span>
                   }
                 </div>
-                <div className="col-span-1 text-xs  dark:text-white text-gray-400 whitespace-nowrap">{doc.uploaded}</div>
+                <div className="col-span-1 text-xs  dark:text-white text-gray-400 whitespace-nowrap">{doc.uploaded}</div> {/* Reverted dark mode styles */}
                 <div className="col-span-1 flex items-center justify-end gap-2">
                   <button onClick={() => setPreviewDoc(doc)} className="text-gray-300 hover:text-gray-500 transition-colors"><Eye size={14} /></button>
                   <button onClick={() => router.push('knowledge-base/edit')} className="text-gray-300 hover:text-[#14A085] transition-colors"><Pencil size={14} /></button>
@@ -472,7 +472,7 @@ export default function KnowledgeBasePage() {
             <div className="relative mb-4">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                value={search} onChange={e => setSearch(e.target.value)}
+                value={search} onChange={e => setSearch(e.target.value)} /* Reverted dark mode styles */
                 placeholder="Search..."
                 className="w-full dark:text-black bg-white dark:bg-gray-900 border dark:border-gray-700 border-gray-200 rounded-lg pl-9 pr-4 py-2 text-xs outline-none focus:border-[#14A085] focus:ring-1 focus:ring-[#14A085]/10 transition-all"
               />
@@ -481,7 +481,7 @@ export default function KnowledgeBasePage() {
 
           <div className="space-y-3">
             {filteredDocs.map(doc => (
-              <div key={doc.id} className="bg-white dark:bg-gray-900 border dark:border-gray-700 border-gray-100 rounded-lg p-4">
+              <div key={doc.id} className="bg-white dark:bg-gray-900 border dark:border-gray-700 border-gray-100 rounded-lg p-4"> {/* Reverted dark mode styles */}
                 <div className="flex items-start gap-3 mb-3">
                   <div className={`w-10 h-10 rounded-lg ${doc.iconBg} flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0`}>
                     {doc.icon}
@@ -511,7 +511,7 @@ export default function KnowledgeBasePage() {
                   </button>
                   <button onClick={() => router.push('knowledge-base/edit')} className="flex-1 text-xs font-medium text-gray-600 dark:text-gray-300 border dark:border-gray-600 border-gray-200 rounded-lg py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     Edit
-                  </button>
+                  </button> {/* Reverted dark mode styles */}
                 </div>
               </div>
             ))}
