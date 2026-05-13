@@ -1,78 +1,23 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Paperclip, Send, X, ChevronDown, Plus } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
+import { useRouter } from "next/navigation";
+import { useTelegramWS } from "@/hooks/useTelegram";
 
-const CONVOS = [
-  {
-    id: "1",
-    name: "Emma Wilson",
-    preview: "Where's my order? I ordered 3 days ago...",
-    time: "2m ago",
-    channel: "WhatsApp",
-    tag: "AI: Medium",
-    tagColor: "bg-yellow-100 text-yellow-700",
-    active: true,
-  },
-  {
-    id: "2",
-    name: "James Rodriguez",
-    preview: "Thanks! That solved my problem.",
-    time: "15m ago",
-    channel: "",
-    tag: "Resolved",
-    tagColor: "bg-green-100 text-green-700",
-    active: false,
-  },
-  {
-    id: "3",
-    name: "Sophia Chen",
-    preview: "I need to change my shipping address...",
-    time: "32m ago",
-    channel: "Web Chat",
-    tag: "Escalated",
-    tagColor: "bg-red-100 text-red-700",
-    active: false,
-  },
-  {
-    id: "4",
-    name: "Michael Brown",
-    preview: "What's your return policy for sale items?",
-    time: "1h ago",
-    channel: "",
-    tag: "AI: High",
-    tagColor: "bg-blue-100 text-blue-700",
-    active: false,
-  },
-];
 
-const AI_MSGS = [
-  {
-    from: "user",
-    text: "Hi, where's my order? I ordered 3 days ago and haven't received any updates.",
-    time: "10:32 AM",
-  },
-  {
-    from: "ai",
-    text: "Hi Emma! I'd be happy to help you track your order. Could you please provide your order number?",
-    time: "10:32 AM",
-    conf: "92% confidence",
-  },
-  { from: "user", text: "It's order #12847", time: "10:33 AM" },
-  {
-    from: "ai",
-    text: "Thanks! I found your order #12847. It's currently in transit and expected to arrive tomorrow by 5 PM. Here's the tracking link: track.providius.io/12847",
-    time: "10:33 AM",
-    conf: "88% confidence",
-    sources: ["Order Database", "Shipping Policy"],
-  },
-  {
-    from: "user",
-    text: "But I paid for express shipping! It should have arrived yesterday.",
-    time: "10:35 AM",
-  },
-];
+
+/* ── Chat Message Interface ─────────────────────────────────────────────── */
+interface ChatMessage {
+  id: string;
+  from: "user" | "ai" | "human";
+  text: string;
+  time: string;
+  conf?: string; // For AI messages
+  sources?: string[]; // For AI messages
+  agent?: string; // For human messages
+}
 
 /* ── Escalate Modal ─────────────────────────────────────────────────────── */
 function EscalateModal({
@@ -114,7 +59,7 @@ function EscalateModal({
             <select
               value={agent}
               onChange={(e) => setAgent(e.target.value)}
-              className="w-full px-4 py-3 text-sm borderborder-none rounded-xl outline-none focus:border-emerald-600 dark:focus:border-emerald-400 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white appearance-none pr-10 transition-colors"
+              className="w-full px-4 py-3 text-sm border-none rounded-xl outline-none focus:border-emerald-600 dark:focus:border-emerald-400 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white appearance-none pr-10 transition-colors"
             >
               <option>{companyName} (Support Lead)</option>
               <option>Mike Chen (Technical Lead)</option>
@@ -137,7 +82,7 @@ function EscalateModal({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Add context for the agent..."
-            className="w-full px-4 py-3 text-sm borderborder-none rounded-xl outline-none focus:border-emerald-600 dark:focus:border-emerald-400 resize-none bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+            className="w-full px-4 py-3 text-sm border-none rounded-xl outline-none focus:border-emerald-600 dark:focus:border-emerald-400 resize-none bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
           />
         </div>
 
@@ -162,13 +107,59 @@ function EscalateModal({
 
 /* ── Page ───────────────────────────────────────────────────────────────── */
 export default function ConversationsPage() {
-  const [filter, setFilter] = useState("All");
-  const [compose, setCompose] = useState("");
+  interface Convo {
+    id: string;
+    name: string;
+    preview: string;
+    time: string;
+    channel: string;
+    tag: string;
+    tagColor: string;
+    active: boolean;
+  }
+  const [convos, setConvos] = useState<Convo[]>([]);
+  const [chatIdMap, setChatIdMap] = useState<Record<string, string>>({});
+
+  const [filter, setFilter] = useState<"All" | "AI Active" | "Escalated">("All");
+
+  const [typingConvos, setTypingConvos] = useState<Set<string>>(new Set());
+  const typingTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+
+  const [compose, setCompose] = useState(""); // User input for message
   const [showEscalate, setShowEscalate] = useState(false);
   const [escalated, setEscalated] = useState(false);
-  const [note, setNote] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("User");
+  const [messages, setMessages] = useState<ChatMessage[]>([]); // Dynamic chat messages
+  const [isAiTyping, setIsAiTyping] = useState(false); // AI typing indicator
+  const router = useRouter();
+  const messagesEndRef = useRef<HTMLDivElement>(null); // For auto-scrolling
+  const wsRef = useRef<WebSocket | null>(null);
+
+
+  const handleTyping = useCallback((chatId: string) => {
+    const convoId = chatIdMap[chatId] || `tg-${chatId}`;
+
+    setTypingConvos(prev => new Set(prev).add(convoId));
+
+    // Clear previous timer for this convo
+    if (typingTimersRef.current[convoId]) {
+      clearTimeout(typingTimersRef.current[convoId]);
+    }
+
+    // Auto-clear after 3s
+    typingTimersRef.current[convoId] = setTimeout(() => {
+      setTypingConvos(prev => {
+        const next = new Set(prev);
+        next.delete(convoId);
+        return next;
+      });
+    }, 3000);
+  }, [chatIdMap]);
+
+
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -177,7 +168,6 @@ export default function ConversationsPage() {
         setCompanyName("User");
         return;
       }
-
       try {
         const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
         const res = await fetch(`${baseUrl}/api/v1/auth/me`, {
@@ -186,48 +176,152 @@ export default function ConversationsPage() {
         if (res.ok) {
           const data = await res.json();
           setCompanyName(data.company || "User");
-        } else {
-          setCompanyName("User");
+        } else if (res.status === 401) {
+          router.push('/login');
         }
       } catch (err) {
-        console.error("Failed to fetch user profile for conversations:", err);
-        setCompanyName("User");
+        console.error("Failed to fetch user:", err);
       }
     };
     fetchUser();
-  }, []);
+  }, [router]);
 
-  const humanMsgs = [
-    {
+  // Auto-scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isAiTyping]);
+
+  // Telegram WebSocket
+  // Telegram WebSocket
+  // Telegram WebSocket
+  const telegramWsRef = useTelegramWS(
+    (msg) => {
+      const telegramChatId = msg.chat_id;
+      let convoId = chatIdMap[telegramChatId];
+
+      if (!convoId) {
+        convoId = `tg-${telegramChatId}`;
+        setChatIdMap(prev => ({ ...prev, [telegramChatId]: convoId! }));
+
+        setConvos(prev => [{
+          id: convoId!,
+          name: msg.sender_name || "Telegram User",
+          preview: msg.text || "",
+          time: "just now",
+          channel: "Telegram",
+          tag: "AI: High",
+          tagColor: "bg-blue-100 text-blue-700",
+          active: false,
+        }, ...prev]);
+      } else {
+        setConvos(prev => prev.map(c =>
+          c.id === convoId ? { ...c, preview: msg.text || "", time: "just now" } : c
+        ));
+      }
+
+      // Add message to open chat
+      if (selectedId === convoId) {
+        setMessages(prev => [...prev, {
+          id: msg.id || String(Date.now()),
+          from: "user",
+          text: msg.text,
+          time: msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        }]);
+      }
+    },
+    (data) => console.log("Init data:", data),
+    handleTyping
+  );
+
+
+  useEffect(() => {
+    wsRef.current = telegramWsRef.current;
+  }, [telegramWsRef]);
+
+  // ==================== AI SEND (for non-escalated chats) ====================
+  const handleSendMessage = async () => {
+    if (!compose.trim() || isAiTyping) return;
+
+    const userMessage: ChatMessage = {
+      id: String(Date.now()),
+      from: "user",
+      text: compose.trim(),
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setCompose("");
+    setIsAiTyping(true);
+
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
+    // Simulate AI response
+    const aiMessage: ChatMessage = {
+      id: String(Date.now() + 1),
       from: "ai",
-      text: "Thanks! I found your order #12847. It's currently in transit and expected to arrive tomorrow by 5 PM. Here's the tracking link: track.providius.io/12847",
-      time: "10:33 AM",
-      conf: "88% confidence",
-      sources: ["Order Database", "Shipping Policy"],
-    },
-    {
+      text: "Thank you for your message. How else can I assist you today?",
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      conf: "85% confidence",
+    };
+
+    setMessages(prev => [...prev, aiMessage]);
+    setIsAiTyping(false);
+  };
+
+  // ==================== HUMAN SEND (for escalated / Telegram chats) ====================
+  const handleHumanSendMessage = async () => {
+    if (!compose.trim() || !selectedId) return;
+
+    const telegramChatId = Object.entries(chatIdMap).find(([_, id]) => id === selectedId)?.[0];
+    const text = compose.trim();
+
+    if (telegramChatId) {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          action: "send_message",
+          chat_id: telegramChatId,
+          text: text,
+          agent_name: companyName,
+        }));
+      } else {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+        await fetch(`${baseUrl}/api/v1/telegram/send`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: telegramChatId, text }),
+        });
+      }
+    }
+
+    const humanMessage: ChatMessage = {
+      id: String(Date.now()),
       from: "human",
-      text: `Hi Emma, this is ${companyName}. I've taken over the chat. I can see your order #12847 is currently being processed at our warehouse. I'll expedite this for you right now.`,
-      time: "10:32 AM",
+      text,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       agent: companyName,
-    },
-  ];
+    };
 
-  const msgs = escalated ? humanMsgs : AI_MSGS;
-  const selectedConvo = selectedId ? CONVOS.find((c) => c.id === selectedId) : null;
+    setMessages(prev => [...prev, humanMessage]);
+    setCompose("");
+  };
 
-  function handleEscalate() {
+  const selectedConvo = selectedId ? convos.find(c => c.id === selectedId) : null;
+
+  const handleEscalate = () => {
     setEscalated(true);
     setShowEscalate(false);
-  }
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+    setMessages(prev => [...prev, {
+      id: String(Date.now()),
+      from: "ai",
+      text: `Conversation escalated to ${companyName}. AI autopilot disabled.`,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      conf: "100% confidence",
+    }]);
   };
+
+  const getInitials = (name: string) => name.split(" ").map(n => n[0]).join("").toUpperCase();
+
+
 
   return (
     <div className="flex flex-col xl:flex-row h-screen bg-[#F7FAFC] dark:bg-gray-950 overflow-hidden transition-colors duration-200">
@@ -235,7 +329,7 @@ export default function ConversationsPage() {
       <div className="hidden xl:block">
         <Sidebar />
       </div>
-                    <MobileNav/>
+      <MobileNav />
 
 
       {/* Conversation list - Mobile: Full width, Desktop: Sidebar */}
@@ -271,12 +365,11 @@ export default function ConversationsPage() {
             {["All", "AI Active", "Escalated"].map((f) => (
               <button
                 key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                  filter === f
+                onClick={() => setFilter(f as "All" | "AI Active" | "Escalated")}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${filter === f
                     ? "bg-teal-500 dark:bg-teal-600 text-white"
                     : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
-                }`}
+                  }`}
               >
                 {f}
               </button>
@@ -286,15 +379,14 @@ export default function ConversationsPage() {
 
         {/* Conversations List */}
         <div className="flex-1 overflow-y-auto scrollbar-thin divide-y divide-gray-50 dark:divide-gray-800 transition-colors duration-200">
-          {CONVOS.map((c) => (
+          {convos.map((c) => (
             <div
               key={c.id}
               onClick={() => setSelectedId(c.id)}
-              className={`px-3 xl:px-4 py-3 xl:py-4 cursor-pointer bg-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex gap-3 border-none xl:border-l-2 ${
-                c.active
+              className={`px-3 xl:px-4 py-3 xl:py-4 cursor-pointer bg-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex gap-3 border-none xl:border-l-2 ${c.active
                   ? "xl:bg-teal-50 dark:bg-teal-900/10 border-teal-500"
                   : "border-transparent"
-              }`}
+                }`}
             >
               {/* Avatar */}
               <div className="w-10 h-10 xl:w-12 xl:h-12 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-xs xl:text-sm font-bold flex-shrink-0">
@@ -346,9 +438,8 @@ export default function ConversationsPage() {
       {/* Chat Area - Mobile: Full screen overlay, Desktop: Sidebar */}
       {selectedConvo && (
         <div
-          className={`${
-            selectedId ? "fixed xl:relative" : "hidden xl:flex"
-          } inset-0 xl:ml-16 xl:inset-auto w-full xl:w-[50%] h-full xl:h-[92%] xl:mt-10 bg-white dark:bg-gray-900 transition-colors duration-200 flex flex-col z-40`}
+          className={`${selectedId ? "fixed xl:relative" : "hidden xl:flex"
+            } inset-0 xl:ml-16 xl:inset-auto w-full xl:w-[50%] h-full xl:h-[92%] xl:mt-10 bg-white dark:bg-gray-900 transition-colors duration-200 flex flex-col z-40`}
         >
           {/* Mobile Back Button */}
           <div className="xl:hidden px-3 xl:px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2 flex-shrink-0">
@@ -364,9 +455,8 @@ export default function ConversationsPage() {
           </div>
 
           {/* Chat Header - Desktop visible always, Mobile shown */}
-          <div className={`px-4 xl:px-6 py-3 xl:py-4 border-b border-gray-100 dark:border-gray-800 ${
-            selectedId ? "hidden xl:flex" : "flex"
-          } xl:flex items-center justify-between flex-shrink-0 transition-colors duration-200`}>
+          <div className={`px-4 xl:px-6 py-3 xl:py-4 border-b border-gray-100 dark:border-gray-800 ${selectedId ? "hidden xl:flex" : "flex"
+            } xl:flex items-center justify-between flex-shrink-0 transition-colors duration-200`}>
             <div className="flex items-center gap-2 xl:gap-3">
               <div className="w-8 h-8 xl:w-9 xl:h-9 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center text-white text-xs xl:text-sm font-bold transition-colors">
                 {getInitials(selectedConvo.name)}
@@ -381,77 +471,76 @@ export default function ConversationsPage() {
               </div>
             </div>
             <div className="flex items-center gap-1 xl:gap-2 flex-wrap">
-            {escalated ? (
-              <>
-                <span className="flex items-center gap-1 text-[10px] xl:text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 xl:px-3 py-1 xl:py-1.5 rounded-full transition-colors">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
-                  </svg>
-                  Human Active
-                </span>
-                <div className="flex items-center gap-1 xl:gap-2 text-xs xl:text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">
-                  <div className="w-6 h-6 xl:w-7 xl:h-7 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-[9px] xl:text-xs font-bold transition-colors">
-                    {companyName.charAt(0).toUpperCase()}
+              {escalated ? (
+                <>
+                  <span className="flex items-center gap-1 text-[10px] xl:text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 xl:px-3 py-1 xl:py-1.5 rounded-full transition-colors">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    Human Active
+                  </span>
+                  <div className="flex items-center gap-1 xl:gap-2 text-xs xl:text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">
+                    <div className="w-6 h-6 xl:w-7 xl:h-7 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-[9px] xl:text-xs font-bold transition-colors">
+                      {companyName.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="hidden xl:inline">{companyName}</span>
                   </div>
-                  <span className="hidden xl:inline">{companyName}</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <span className="flex items-center gap-1 text-[10px] xl:text-xs font-medium text-teal-600 dark:text-teal-400 bg-teal-100 dark:bg-teal-900/30 px-2 xl:px-3 py-1 xl:py-1.5 rounded-full transition-colors">
-                  <span className="w-1 h-1 bg-teal-600 dark:bg-teal-400 rounded-full" /> AI Active
-                </span>
-                <span className="text-[10px] xl:text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 xl:px-3 py-1 xl:py-1.5 rounded-full transition-colors">
-                  Confidence: 72%
-                </span>
-                <button
-                  onClick={() => setShowEscalate(true)}
-                  className="flex items-center gap-1 text-[10px] xl:text-xs font-semibold text-red-500 dark:text-red-400 border border-red-200 dark:border-red-900/50 px-2 xl:px-3 py-1 xl:py-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                >
-                  <svg width="10" height="10" fill="none" viewBox="0 0 24 24">
-                    <path
-                      d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
-                  </svg>
-                  Escalate
-                </button>
-              </>
-            )}
+                </>
+              ) : (
+                <>
+                  <span className="flex items-center gap-1 text-[10px] xl:text-xs font-medium text-teal-600 dark:text-teal-400 bg-teal-100 dark:bg-teal-900/30 px-2 xl:px-3 py-1 xl:py-1.5 rounded-full transition-colors">
+                    <span className="w-1 h-1 bg-teal-600 dark:bg-teal-400 rounded-full" /> AI Active
+                  </span>
+                  <span className="text-[10px] xl:text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 xl:px-3 py-1 xl:py-1.5 rounded-full transition-colors">
+                    Confidence: 72%
+                  </span>
+                  <button
+                    onClick={() => setShowEscalate(true)}
+                    className="flex items-center gap-1 text-[10px] xl:text-xs font-semibold text-red-500 dark:text-red-400 border border-red-200 dark:border-red-900/50 px-2 xl:px-3 py-1 xl:py-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24">
+                      <path
+                        d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    Escalate
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-        </div>
 
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto scrollbar-thin px-3 xl:px-5 xl:px-6 py-3 xl:py-4 xl:py-5 space-y-3 xl:space-y-4 bg-white dark:bg-gray-900 transition-colors duration-200">
-            {msgs.map((msg, i) => (
+            {messages.map((msg, i) => (
               <div
                 key={i}
                 className={`flex ${msg.from !== "user" ? "justify-end" : "justify-start"}`}
               >
                 <div className="max-w-[85%] xl:max-w-[72%]">
                   <div
-                    className={`px-3 xl:px-4 py-2 xl:py-3 rounded-2xl text-xs xl:text-sm leading-relaxed ${
-                      msg.from === "human"
-                        ? "bg-blue-500 dark:bg-blue-600 text-white rounded-br-sm transition-colors"
-                        : msg.from === "ai"
-                        ? "bg-teal-500 dark:bg-teal-600 text-white rounded-br-sm transition-colors"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm shadow-sm dark:shadow-none transition-colors"
-                    }`}
+                    className={`px-3 xl:px-4 py-2 xl:py-3 rounded-2xl text-xs xl:text-sm leading-relaxed ${msg.from === "user"
+                        ? "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm shadow-sm dark:shadow-none transition-colors"
+                        : msg.from === "human"
+                          ? "bg-blue-500 dark:bg-blue-600 text-white rounded-br-sm transition-colors"
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm shadow-sm dark:shadow-none transition-colors"
+                      }`}
                   >
                     {msg.text}
                     {"sources" in msg && msg.sources && (
                       <div className="mt-1.5 xl:mt-2 pt-1.5 xl:pt-2 border-t border-white/20 text-[10px] xl:text-[11px]">
                         <p className="text-white/70 mb-0.5">📎 Sources used:</p>
-                        <p className="text-emerald-200">
+                        <p className="text-white">
                           {(msg.sources as string[]).join(", ")}
                         </p>
                       </div>
@@ -467,34 +556,65 @@ export default function ConversationsPage() {
                 </div>
               </div>
             ))}
+
+            {/* AI Typing Indicator */}
+            {isAiTyping && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl rounded-bl-sm shadow-sm dark:shadow-none px-3 xl:px-4 py-2 xl:py-3 text-xs xl:text-sm">
+                  <div className="flex gap-1.5">
+                    <div
+                      className="w-2 h-2 bg-teal-600 dark:bg-teal-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    />
+                    <div
+                      className="w-2 h-2 bg-teal-600 dark:bg-teal-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    />
+                    <div
+                      className="w-2 h-2 bg-teal-600 dark:bg-teal-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} /> {/* Scroll target */}
           </div>
-          {/* Input Area */}
+          {/* Input Area - This section handles both escalated and non-escalated input */}
           <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 flex-shrink-0 transition-colors duration-200">
             {!escalated && (
               <div className="p-3 xl:p-4 xl:p-5 space-y-2 xl:space-y-3">
-                <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-900/50 rounded-lg px-3 xl:px-4 py-2 xl:py-2.5 transition-colors">
-                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-500 flex-shrink-0" />
-                  <span className="text-[10px] xl:text-xs text-orange-700 dark:text-orange-400 font-medium transition-colors">
-                    AI confidence dropped to 72%. Consider escalating...
-                  </span>
-                  <button
-                    onClick={() => setShowEscalate(true)}
-                    className="bg-orange-500 dark:bg-orange-600 hover:bg-orange-600 dark:hover:bg-orange-700 text-white text-[10px] xl:text-xs font-semibold px-2 xl:px-3 py-1 xl:py-1.5 rounded transition-colors flex-shrink-0 ml-auto"
-                  >
-                    Escalate Now
-                  </button>
-                </div>
+                {/* AI confidence warning */}
+                {messages.length > 0 && !isAiTyping && ( // Only show if there are messages and AI isn't typing
+                  <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-900/50 rounded-lg px-3 xl:px-4 py-2 xl:py-2.5 transition-colors">
+                    <div className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-500 flex-shrink-0" />
+                    <span className="text-[10px] xl:text-xs text-orange-700 dark:text-orange-400 font-medium transition-colors">
+                      AI confidence dropped to 72%. Consider escalating...
+                    </span>
+                    <button
+                      onClick={() => setShowEscalate(true)}
+                      className="bg-orange-500 dark:bg-orange-600 hover:bg-orange-600 dark:hover:bg-orange-700 text-white text-[10px] xl:text-xs font-semibold px-2 xl:px-3 py-1 xl:py-1.5 rounded transition-colors flex-shrink-0 ml-auto"
+                    >
+                      Escalate Now
+                    </button>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 xl:px-4 py-2 xl:py-2.5 transition-colors">
                   <input
                     placeholder="Type a message..."
                     value={compose}
                     onChange={(e) => setCompose(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
                     className="flex-1 bg-transparent text-xs xl:text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-colors"
                   />
                   <button className="text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors flex-shrink-0">
                     <Paperclip size={14} />
                   </button>
-                  <button className="w-7 h-7 xl:w-8 xl:h-8 rounded-lg bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 flex items-center justify-center text-white flex-shrink-0 transition-colors">
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!compose.trim() || isAiTyping}
+                    className="w-7 h-7 xl:w-8 xl:h-8 rounded-lg bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 flex items-center justify-center text-white flex-shrink-0 transition-colors disabled:opacity-50"
+                  >
                     <Send size={13} />
                   </button>
                 </div>
@@ -505,32 +625,41 @@ export default function ConversationsPage() {
                 <div className="flex items-center justify-center py-1 xl:py-1.5 mb-2 xl:mb-3">
                   <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5 transition-colors">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2a10 10 0 100 20A10 10 0 0012 2z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M12 8v4l3 3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
+                      <path d="M12 2a10 10 0 100 20A10 10 0 0012 2z" stroke="currentColor" strokeWidth="1.5" />
+                      <path d="M12 8v4l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
                     AI Autopilot Disabled
                   </span>
                 </div>
+
+                {/* Customer typing indicator — shown above input when escalated */}
+                {selectedId && typingConvos.has(selectedId) && (
+                  <div className="flex items-center gap-1.5 mb-2 px-1">
+                    <div className="flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                    </div>
+                    <span className="text-[10px] xl:text-xs text-gray-400 dark:text-gray-500">Customer is typing...</span>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 xl:px-4 py-2 xl:py-2.5 transition-colors">
                   <input
                     placeholder={`Type as ${companyName}...`}
                     value={compose}
                     onChange={(e) => setCompose(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleHumanSendMessage()}
                     className="flex-1 bg-transparent text-xs xl:text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-colors"
                   />
                   <button className="text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors flex-shrink-0">
                     <Paperclip size={14} />
                   </button>
-                  <button className="w-7 h-7 xl:w-8 xl:h-8 rounded-lg bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 flex items-center justify-center text-white flex-shrink-0 transition-colors">
+                  <button
+                    onClick={handleHumanSendMessage}
+                    disabled={!compose.trim()}
+                    className="w-7 h-7 xl:w-8 xl:h-8 rounded-lg bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 flex items-center justify-center text-white flex-shrink-0 transition-colors disabled:opacity-50"
+                  >
                     <Send size={13} />
                   </button>
                 </div>

@@ -134,7 +134,6 @@ export default function SignInPage() {
                 <input
                   type="email"
                   className="w-full border-none border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 xl:py-4 text-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-800 outline-none transition-all focus:border-emerald-600 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-600/10 dark:focus:ring-emerald-500/20"
-                  className="w-full border-none border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 xl:py-4 text-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-800 outline-none transition-all focus:border-emerald-600 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-600/10 dark:focus:ring-emerald-500/20" /* Reverted dark mode styles */
                   placeholder="you@company.com"
                   value={email}
                   required

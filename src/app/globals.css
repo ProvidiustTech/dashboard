@@ -34,7 +34,7 @@
 @layer base {
   @font-face {
     font-family: 'Degular';
-    src: url('/fonts/degular-regular.woff2') format('woff2');
+    src: url('/fonts/degulardemo-regular-webfont.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap; /* Ensure font is swapped */
