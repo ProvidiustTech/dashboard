@@ -521,7 +521,7 @@ export default function ConversationsPage() {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto scrollbar-thin px-3 xl:px-5 xl:px-6 py-3 xl:py-4 xl:py-5 space-y-3 xl:space-y-4 bg-white dark:bg-gray-900 transition-colors duration-200">
+          <div className="flex-1 overflow-y-auto scrollbar-thin px-3 xl:px-6 py-3 xl:py-5 space-y-3 xl:space-y-4 bg-white dark:bg-gray-900 transition-colors duration-200">
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -583,7 +583,7 @@ export default function ConversationsPage() {
           {/* Input Area - This section handles both escalated and non-escalated input */}
           <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 flex-shrink-0 transition-colors duration-200">
             {!escalated && (
-              <div className="p-3 xl:p-4 xl:p-5 space-y-2 xl:space-y-3">
+              <div className="p-3 xl:p-4 space-y-2 xl:space-y-3">
                 {/* AI confidence warning */}
                 {messages.length > 0 && !isAiTyping && ( // Only show if there are messages and AI isn't typing
                   <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-900/50 rounded-lg px-3 xl:px-4 py-2 xl:py-2.5 transition-colors">
@@ -621,7 +621,7 @@ export default function ConversationsPage() {
               </div>
             )}
             {escalated && (
-              <div className="p-3 xl:p-4 xl:p-5">
+              <div className="p-3 xl:p-5">
                 <div className="flex items-center justify-center py-1 xl:py-1.5 mb-2 xl:mb-3">
                   <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5 transition-colors">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
