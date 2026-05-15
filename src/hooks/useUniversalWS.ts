@@ -1,7 +1,7 @@
 // hooks/useTelegram.ts
 import { useEffect, useRef, useCallback } from "react";
 
-export function useTelegramWS(
+export function useUniversalWS(
   onNewMessage: (msg: any) => void,
   onInit?: (data: any) => void,
   onTyping?: (chatId: string) => void
@@ -35,7 +35,7 @@ export function useTelegramWS(
     wsRef.current = ws;
     isConnectedRef.current = true;
 
-    ws.onopen = () => console.log("✅ WebSocket Connected");
+    ws.onopen = () => console.log(" WebSocket Connected");
 
     ws.onmessage = (event) => {
       try {
@@ -59,7 +59,7 @@ export function useTelegramWS(
       setTimeout(connect, 1500);
     };
 
-    ws.onerror = () => console.error("❌ WebSocket Error");
+    ws.onerror = () => console.error(" WebSocket Error");
   }, []); // empty deps — connect never changes
 
   useEffect(() => {

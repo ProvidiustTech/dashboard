@@ -4,7 +4,7 @@ import { Search, Paperclip, Send, X, ChevronDown, Plus } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
 import { useRouter } from "next/navigation";
-import { useTelegramWS } from "@/hooks/useTelegram";
+import { useUniversalWS } from "@/hooks/useUniversalWS";
 
 
 
@@ -105,6 +105,23 @@ function EscalateModal({
   );
 }
 
+type Platform = "telegram" | "whatsapp" | "webchat" | string;
+
+const CHANNEL_STYLES: Record<string, { label: string; className: string }> = {
+  telegram:  { label: "Telegram",  className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
+  whatsapp:  { label: "WhatsApp",  className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
+  webchat:   { label: "Web Chat",  className: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400" },
+};
+
+function ChannelBadge({ platform }: { platform: Platform }) {
+  const style = CHANNEL_STYLES[platform] ?? { label: platform, className: "bg-gray-100 text-gray-600" };
+  return (
+    <span className={`text-[9px] xl:text-[10px] font-medium px-1.5 py-0.5 rounded-full ${style.className}`}>
+      {style.label}
+    </span>
+  );
+}
+
 /* ── Page ───────────────────────────────────────────────────────────────── */
 export default function ConversationsPage() {
   interface Convo {
@@ -113,6 +130,7 @@ export default function ConversationsPage() {
     preview: string;
     time: string;
     channel: string;
+    platform: Platform;
     tag: string;
     tagColor: string;
     active: boolean;
@@ -139,7 +157,7 @@ export default function ConversationsPage() {
 
 
   const handleTyping = useCallback((chatId: string) => {
-    const convoId = chatIdMap[chatId] || `tg-${chatId}`;
+    const convoId = chatIdMap[chatId] || `telegram-${chatId}`;
 
     setTypingConvos(prev => new Set(prev).add(convoId));
 
@@ -194,49 +212,50 @@ export default function ConversationsPage() {
   // Telegram WebSocket
   // Telegram WebSocket
   // Telegram WebSocket
-  const telegramWsRef = useTelegramWS(
-    (msg) => {
-      const telegramChatId = msg.chat_id;
-      let convoId = chatIdMap[telegramChatId];
+  const universalWsRef = useUniversalWS(
+  (msg) => {
+    const platform: Platform = msg.platform || "telegram";
+    const senderId = msg.chat_id || msg.sender_id;
+    let convoId = chatIdMap[senderId];
 
-      if (!convoId) {
-        convoId = `tg-${telegramChatId}`;
-        setChatIdMap(prev => ({ ...prev, [telegramChatId]: convoId! }));
+    if (!convoId) {
+      convoId = `${platform}-${senderId}`;
+      setChatIdMap(prev => ({ ...prev, [senderId]: convoId! }));
 
-        setConvos(prev => [{
-          id: convoId!,
-          name: msg.sender_name || "Telegram User",
-          preview: msg.text || "",
-          time: "just now",
-          channel: "Telegram",
-          tag: "AI: High",
-          tagColor: "bg-blue-100 text-blue-700",
-          active: false,
-        }, ...prev]);
-      } else {
-        setConvos(prev => prev.map(c =>
-          c.id === convoId ? { ...c, preview: msg.text || "", time: "just now" } : c
-        ));
-      }
+      setConvos(prev => [{
+        id: convoId!,
+        name: msg.sender_name || "Unknown",
+        preview: msg.text || "",
+        time: "just now",
+        channel: platform,
+        platform,
+        tag: "AI: High",
+        tagColor: "bg-blue-100 text-blue-700",
+        active: false,
+      }, ...prev]);
+    } else {
+      setConvos(prev => prev.map(c =>
+        c.id === convoId ? { ...c, preview: msg.text || "", time: "just now" } : c
+      ));
+    }
 
-      // Add message to open chat
-      if (selectedId === convoId) {
-        setMessages(prev => [...prev, {
-          id: msg.id || String(Date.now()),
-          from: "user",
-          text: msg.text,
-          time: msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }]);
-      }
-    },
-    (data) => console.log("Init data:", data),
-    handleTyping
-  );
+    if (selectedId === convoId) {
+      setMessages(prev => [...prev, {
+        id: msg.id || String(Date.now()),
+        from: "user",
+        text: msg.text,
+        time: msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }]);
+    }
+  },
+  (data) => console.log("Init data:", data),
+  handleTyping
+);
 
 
   useEffect(() => {
-    wsRef.current = telegramWsRef.current;
-  }, [telegramWsRef]);
+    wsRef.current = universalWsRef.current;
+  }, [universalWsRef]);
 
   // ==================== AI SEND (for non-escalated chats) ====================
   const handleSendMessage = async () => {
@@ -270,40 +289,50 @@ export default function ConversationsPage() {
 
   // ==================== HUMAN SEND (for escalated / Telegram chats) ====================
   const handleHumanSendMessage = async () => {
-    if (!compose.trim() || !selectedId) return;
+  if (!compose.trim() || !selectedId) return;
 
-    const telegramChatId = Object.entries(chatIdMap).find(([_, id]) => id === selectedId)?.[0];
-    const text = compose.trim();
+  const senderId = Object.entries(chatIdMap).find(([_, id]) => id === selectedId)?.[0];
+  const text = compose.trim();
+  const platform = selectedConvo?.platform ?? "telegram";
 
-    if (telegramChatId) {
-      if (wsRef.current?.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({
-          action: "send_message",
-          chat_id: telegramChatId,
-          text: text,
-          agent_name: companyName,
-        }));
-      } else {
-        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
-        await fetch(`${baseUrl}/api/v1/telegram/send`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: telegramChatId, text }),
-        });
-      }
-    }
-
-    const humanMessage: ChatMessage = {
-      id: String(Date.now()),
-      from: "human",
-      text,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      agent: companyName,
-    };
-
-    setMessages(prev => [...prev, humanMessage]);
-    setCompose("");
+  const SEND_ROUTES: Record<string, string> = {
+    telegram: "/api/v1/telegram/send",
+    whatsapp: "/api/v1/whatsapp/send",
+    webchat:  "/api/v1/webchat/send",
   };
+
+  if (senderId) {
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+    const route = SEND_ROUTES[platform] ?? SEND_ROUTES.telegram;
+
+    // Telegram uses WebSocket if available, others go straight to REST
+    if (platform === "telegram" && wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        action: "send_message",
+        chat_id: senderId,
+        text,
+        agent_name: companyName,
+      }));
+    } else {
+      await fetch(`${baseUrl}${route}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: senderId, text, agent_name: companyName, platform }),
+      });
+    }
+  }
+
+  const humanMessage: ChatMessage = {
+    id: String(Date.now()),
+    from: "human",
+    text,
+    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    agent: companyName,
+  };
+
+  setMessages(prev => [...prev, humanMessage]);
+  setCompose("");
+};
 
   const selectedConvo = selectedId ? convos.find(c => c.id === selectedId) : null;
 
@@ -423,11 +452,7 @@ export default function ConversationsPage() {
                       {c.tag}
                     </span>
                   )}
-                  {c.channel && (
-                    <span className="text-[9px] xl:text-[10px] font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded-full">
-                      {c.channel}
-                    </span>
-                  )}
+                  {c.platform && <ChannelBadge platform={c.platform} />}
                 </div>
               </div>
             </div>
